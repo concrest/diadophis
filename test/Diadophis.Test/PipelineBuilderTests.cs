@@ -27,7 +27,7 @@ namespace Diadophis.Test
         {
             var pipeline = _sut.Build();
 
-            var actual = pipeline.Invoke(new FakeMessageContext(_fakeServiceProvider));
+            var actual = pipeline.Invoke(_fakeMessageContext);
 
             Assert.True(actual.IsCompleted);
         }
