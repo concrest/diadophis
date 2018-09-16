@@ -137,7 +137,7 @@ namespace Diadophis
                 var parameterType = parameters[i].ParameterType;
                 if (parameterType.IsByRef)
                 {
-                    throw new NotSupportedException($"The 'InvokeMethodName' method must not have ref or out parameters.");
+                    throw new InvalidOperationException($"The '{InvokeAsyncMethodName}' method must not have ref or out parameters.");
                 }
 
                 var parameterTypeExpression = new Expression[]

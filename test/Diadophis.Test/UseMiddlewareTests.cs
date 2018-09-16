@@ -34,6 +34,23 @@ namespace Diadophis.Test
         }
 
         [Theory]
+        [InlineData(typeof(CtorDependencyInjection))]
+        [InlineData(typeof(InvokeAsyncMethodInjection))]
+        public void UseMiddleware_supports_dependency_injection(Type middlewareType)
+        {
+            var middlewareDependency = new MiddlewareDependency();
+
+            _fakeServiceProvider.Register<IMiddlewareDependency>(middlewareDependency);
+
+            _sut
+               .UseMiddleware(middlewareType)
+               .Build()
+               .Invoke(_fakeMessageContext);
+
+            Assert.Equal(1, middlewareDependency.CallCount);
+        }
+
+        [Theory]
         [InlineData(typeof(NoInvokeMethods),
             "No InvokeAsync method found on Diadophis.Test.Middleware.NoInvokeMethods")]
         [InlineData(typeof(TooManyInvokeMethods),
@@ -44,6 +61,8 @@ namespace Diadophis.Test
             "First parameter on Diadophis.Test.Middleware.InvokeMethodNoArgs.InvokeAsync must be a MessageContext")]
         [InlineData(typeof(InvokeMethodFirstArgNotMessageContext),
             "First parameter on Diadophis.Test.Middleware.InvokeMethodFirstArgNotMessageContext.InvokeAsync must be a MessageContext")]
+        [InlineData(typeof(InvokeMethodWithRefArg),
+            "The 'InvokeAsync' method must not have ref or out parameters.")]
         public void UseMiddleware_throws_for_invalid_middleware(Type middleware, string expectedError)
         {
             var exception = Assert.Throws<InvalidOperationException>(() =>
@@ -54,6 +73,38 @@ namespace Diadophis.Test
             });
 
             Assert.Equal(expectedError, exception.Message);
+        }
+
+        [Fact]
+        public void UseMiddleware_throws_on_Invoke_for_unknown_dependencies()
+        {
+            var exception = Assert.Throws<InvalidOperationException>(() =>
+            {
+                _sut
+                    .UseMiddleware<InvokeAsyncMethodInjection>()
+                    .Build()
+                    .Invoke(_fakeMessageContext);
+            });
+
+            Assert.Equal("Unable to resolve service for type 'Diadophis.Test.IMiddlewareDependency' while attempting to Invoke middleware 'Diadophis.Test.Middleware.InvokeAsyncMethodInjection'.", 
+                exception.Message);
+        }
+
+        [Fact]
+        public void UseMiddleware_throws_on_Invoke_when_service_provider_unavailable()
+        {
+            var sutWithNoIoC = new PipelineBuilder(null);
+            var contextWithNoIoC = new FakeMessageContext(null);
+
+            var exception = Assert.Throws<InvalidOperationException>(() =>
+            {
+                sutWithNoIoC
+                    .UseMiddleware<InvokeAsyncMethodInjection>()
+                    .Build()
+                    .Invoke(contextWithNoIoC);
+            });
+
+            Assert.Equal("'IServiceProvider' is not available.", exception.Message);
         }
     }
 }
