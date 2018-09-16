@@ -69,7 +69,7 @@ namespace Diadophis
                 var parameters = methodinfo.GetParameters();
                 if (parameters.Length == 0 || parameters[0].ParameterType != typeof(MessageContext))
                 {
-                    throw new InvalidOperationException($"First parameter on {middleware}.InvokeAsync must be a ${nameof(MessageContext)}");
+                    throw new InvalidOperationException($"First parameter on {middleware}.InvokeAsync must be a {nameof(MessageContext)}");
                 }
 
                 var ctorArgs = new object[args.Length + 1];

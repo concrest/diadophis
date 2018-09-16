@@ -54,6 +54,7 @@ namespace Diadophis.Test
         {
             _sut.Run(context => Task.CompletedTask);
 
+            // This next middleware shouldn't be run if .Run is really terminal:
             _sut.Run(MiddlewareWithException);
 
             var actual = _sut.Build().Invoke(_fakeMessageContext);
@@ -64,6 +65,8 @@ namespace Diadophis.Test
         [ExcludeFromCodeCoverage]
         private Task MiddlewareWithException(MessageContext context)
         {
+            // Will only be called if .Run isn't terminal
+            // So this code is not executed if the test passes
             throw new NotSupportedException();
         }
     }

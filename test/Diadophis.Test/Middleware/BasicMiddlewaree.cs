@@ -7,20 +7,23 @@ namespace Diadophis.Test.Middleware
 {
     public class BasicMiddleware
     {
-        private readonly MessageDelegate _next;
+        public const string CountPropertyKey = "BasicMiddlewareInvokeCount";
 
-        public int InvokeCount { get; private set; }
+        private readonly MessageDelegate _next;
 
         public BasicMiddleware(MessageDelegate next)
         {
             _next = next;
-
-            InvokeCount = 0;
         }
 
         public Task InvokeAsync(MessageContext context)
         {
-            InvokeCount++;
+            var currentInvokeCount = context.GetProperty<int>(CountPropertyKey);
+            currentInvokeCount++;
+
+            context.SetProperty(CountPropertyKey, currentInvokeCount);
+
+
             return _next(context);
         }
     }
