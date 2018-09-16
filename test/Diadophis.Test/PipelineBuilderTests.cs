@@ -11,10 +11,15 @@ namespace Diadophis.Test
     public class PipelineBuilderTests
     {
         private readonly PipelineBuilder _sut;
+        private readonly FakeServiceProvider _fakeServiceProvider;
+        private readonly FakeMessageContext _fakeMessageContext;
 
         public PipelineBuilderTests()
         {
-            _sut = new PipelineBuilder();
+            _fakeServiceProvider = new FakeServiceProvider();
+            _sut = new PipelineBuilder(_fakeServiceProvider);
+
+            _fakeMessageContext = new FakeMessageContext(_fakeServiceProvider);
         }
 
         [Fact]
@@ -22,7 +27,7 @@ namespace Diadophis.Test
         {
             var pipeline = _sut.Build();
 
-            var actual = pipeline.Invoke(new FakeMessageContext());
+            var actual = pipeline.Invoke(new FakeMessageContext(_fakeServiceProvider));
 
             Assert.True(actual.IsCompleted);
         }
@@ -39,7 +44,7 @@ namespace Diadophis.Test
 
             _sut.Use(middleware);
 
-            _sut.Build().Invoke(new FakeMessageContext());
+            _sut.Build().Invoke(_fakeMessageContext);
 
             Assert.True(middlewareCalled);
         }
@@ -51,7 +56,7 @@ namespace Diadophis.Test
 
             _sut.Run(MiddlewareWithException);
 
-            var actual = _sut.Build().Invoke(new FakeMessageContext());
+            var actual = _sut.Build().Invoke(_fakeMessageContext);
 
             Assert.True(actual.IsCompletedSuccessfully);
         }

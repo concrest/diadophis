@@ -5,11 +5,11 @@ using System;
 
 namespace Diadophis.Test
 {
-    internal class FakeMessageContext : MessageContext
+    internal class FakeServiceProvider : IServiceProvider
     {
-        public FakeMessageContext(IServiceProvider serviceProvider) 
-            : base(serviceProvider)
+        public object GetService(Type serviceType)
         {
+            throw new NotImplementedException();
         }
     }
 }

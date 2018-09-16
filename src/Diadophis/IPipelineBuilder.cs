@@ -7,7 +7,8 @@ namespace Diadophis
 {
     public interface IPipelineBuilder
     {
+        IServiceProvider ApplicationServices { get; }
         MessageDelegate Build();
-        PipelineBuilder Use(Func<MessageDelegate, MessageDelegate> middleware);
+        IPipelineBuilder Use(Func<MessageDelegate, MessageDelegate> middleware);
     }
 }

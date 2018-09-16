@@ -14,6 +14,13 @@ namespace Diadophis
     {
         private readonly IList<Func<MessageDelegate, MessageDelegate>> _components = new List<Func<MessageDelegate, MessageDelegate>>();
 
+        public IServiceProvider ApplicationServices { get; }
+
+        public PipelineBuilder(IServiceProvider serviceProvider)
+        {
+            ApplicationServices = serviceProvider;
+        }
+
         public MessageDelegate Build()
         {
             MessageDelegate app = context =>
@@ -29,7 +36,7 @@ namespace Diadophis
             return app;
         }
 
-        public PipelineBuilder Use(Func<MessageDelegate, MessageDelegate> middleware)
+        public IPipelineBuilder Use(Func<MessageDelegate, MessageDelegate> middleware)
         {
             _components.Add(middleware);
             return this;
