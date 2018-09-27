@@ -6,6 +6,6 @@ namespace Diadophis.RabbitMq
     public interface IRabbitMqConfig
     {
         string Uri { get; }
-        int Foo { get; }
+        void ConfigurePipeline(IPipelineBuilder builder);
     }
 }

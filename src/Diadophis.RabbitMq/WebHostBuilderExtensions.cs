@@ -9,6 +9,14 @@ namespace Diadophis.RabbitMq
 {
     public static class WebHostBuilderExtensions
     {
+        public static IWebHostBuilder UseRabbitMqConsumer<TRabbitConfig>(this IWebHostBuilder builder)
+            where TRabbitConfig : class, IRabbitMqConfig, new()
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+            return builder.UseRabbitMqConsumer<TRabbitConfig>(config => { });
+        }
+
         public static IWebHostBuilder UseRabbitMqConsumer<TRabbitConfig>(this IWebHostBuilder builder,
             Action<TRabbitConfig> configureConsumer)
             where TRabbitConfig : class, IRabbitMqConfig, new()
@@ -18,6 +26,9 @@ namespace Diadophis.RabbitMq
             return builder.ConfigureServices(services =>
             {
                 services.Configure(configureConsumer);
+
+                // TODO: Should this be here or in another layer?
+                services.AddTransient<PipelineBuilder>();
                 services.AddHostedService<RabbitMqConsumerService<TRabbitConfig>>();                
             });
         }
