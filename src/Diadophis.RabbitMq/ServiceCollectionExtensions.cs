@@ -19,10 +19,9 @@ namespace Diadophis.RabbitMq
 
             services.Configure<TRabbitConfig>(config);
 
-            // TODO: Should this be here or in another layer?
-            services.AddTransient<PipelineBuilder>();
-
+            services.TryAddTransient<PipelineBuilder>();
             services.TryAddTransient<IConnectionFactory>(_ => new ConnectionFactory { DispatchConsumersAsync = true });
+
             services.AddHostedService<RabbitMqConsumerService<TRabbitConfig>>();
 
             return services;
