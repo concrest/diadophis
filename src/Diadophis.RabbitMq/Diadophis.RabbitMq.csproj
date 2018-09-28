@@ -12,4 +12,10 @@
     <ProjectReference Include="..\Diadophis\Diadophis.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="System">
+      <HintPath>System</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

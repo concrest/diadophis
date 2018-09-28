@@ -29,7 +29,7 @@ namespace SimpleRabbitMqService
 
         public int GetSomeValue()
         {
-            _logger.LogInformation("GetSomeValue called for object {ObjectId}", _objectId);
+            _logger.LogDebug("GetSomeValue called for object {ObjectId}", _objectId);
             return 123;
         }
     }

@@ -42,7 +42,7 @@ namespace SimpleRabbitMqService
         /// <returns></returns>
         public Task InvokeAsync(MessageContext context, IInvokeDependency invokeDependency)
         {
-            _logger.LogInformation("InvokeAsync called");
+            _logger.LogDebug("InvokeAsync called");
 
             // You can access the message from RabbitMQ here:
             var messageFromRabbit = context.GetRabbitMqMessage();

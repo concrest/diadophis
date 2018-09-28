@@ -91,8 +91,6 @@ namespace Diadophis.RabbitMq
         {
             _logger.LogInformation(LoggingEvents.StopAsync, "Stopping RabbitMqConsumerService");
 
-            // TODO: Disconnect channel?
-
             return Task.CompletedTask;
         }
 
@@ -127,6 +125,8 @@ namespace Diadophis.RabbitMq
             try
             {
                 await _pipeline.Invoke(new RabbitMqMessageContext(_serviceProvider, message));
+
+                // TODO: Where is best to Ack or Reject the message?
 
                 _logger.LogDebug(LoggingEvents.ConsumeMessageEnd, "Finished consuming message");
             }

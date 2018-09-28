@@ -28,7 +28,7 @@ namespace SimpleRabbitMqService
 
         public void RunSomeMethod(int count)
         {
-            _logger.LogInformation("RunSomeMethod called for object {ObjectId}, with value {count}", 
+            _logger.LogDebug("RunSomeMethod called for object {ObjectId}, with value {count}", 
                 _objectId, count);
         }
     }
