@@ -1,13 +1,44 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Diadophis;
 using Diadophis.RabbitMq;
+using RabbitMQ.Client;
 
 namespace SimpleRabbitMqService
 {
     internal class SimpleRabbitMqConfig : IRabbitMqConfig
     {
-        public string Uri => "foo";
-       
+        private const string ExchangeName = "my_exchange_name";
+        private const string Type = ExchangeType.Topic;
+        private const bool ExchangeDurable = true;
+        private const bool ExchangeAutoDelete = false;
+
+        private const bool QueueDurable = true;
+        private const bool Exclusive = false;
+        private const bool QueueAutoDelete = false;
+
+        private const uint PrefetchSize = 0;
+        private const ushort PrefetchCount = 10;
+
+        private const string RoutingKey = "my_routing_key";
+
+        
+        public string ConnectionUri { get; set; }
+
+        public string QueueName { get; } = "my_queue_name";
+
+        public bool AutoAck => true;
+
+        public void ConfigureChannel(IModel channel)
+        {
+            channel.ExchangeDeclare(ExchangeName, Type, ExchangeDurable, ExchangeAutoDelete, null);
+            channel.QueueDeclare(QueueName, QueueDurable, Exclusive, QueueAutoDelete, null);
+
+            channel.BasicQos(PrefetchSize, PrefetchCount, false);
+
+            channel.QueueBind(QueueName, ExchangeName, RoutingKey);
+        }
+
         public void ConfigurePipeline(IPipelineBuilder pipe)
         {
             // Middleware type example - terminal if the message is empty

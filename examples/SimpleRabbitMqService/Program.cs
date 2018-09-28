@@ -1,7 +1,5 @@
-﻿using Diadophis.RabbitMq;
-using Microsoft.AspNetCore;
+﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace SimpleRabbitMqService
 {
@@ -14,8 +12,7 @@ namespace SimpleRabbitMqService
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .UseMyDependencies()
-                .UseRabbitMqConsumer<SimpleRabbitMqConfig>();
+                .UseStartup<Startup>();
+                
     }
 }

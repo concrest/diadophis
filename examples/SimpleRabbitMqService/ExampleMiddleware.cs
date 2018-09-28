@@ -1,11 +1,14 @@
 ﻿using System.Threading.Tasks;
 using Diadophis;
+using Diadophis.RabbitMq;
+using Microsoft.Extensions.Logging;
 
 namespace SimpleRabbitMqService
 {
     public class ExampleMiddleware
     {
         private readonly MessageDelegate _next;
+        private readonly ILogger<ExampleMiddleware> _logger;
         private readonly IConstructorDependency _dependency;
 
         /// <summary>
@@ -16,9 +19,10 @@ namespace SimpleRabbitMqService
         /// </summary>
         /// <param name="next">The next delegate in the pipeline</param>
         /// <param name="dependency">A class level dependency, created once per middleware object</param>
-        public ExampleMiddleware(MessageDelegate next, IConstructorDependency dependency)
+        public ExampleMiddleware(MessageDelegate next, ILogger<ExampleMiddleware> logger, IConstructorDependency dependency)
         {
             _next = next;
+            _logger = logger;
             _dependency = dependency;
         }
 
@@ -35,6 +39,14 @@ namespace SimpleRabbitMqService
         /// <returns></returns>
         public Task InvokeAsync(MessageContext context, IInvokeDependency invokeDependency)
         {
+            _logger.LogInformation("InvokeAsync called");
+
+            // You can access the message from RabbitMQ here:
+            var messageFromRabbit = context.GetRabbitMqMessage();
+
+            // Add any processing, ETL, transforms, filtering etc.
+
+            // Call some dependencies, maybe?
             _dependency.RunSomeMethod(invokeDependency.GetSomeValue());
 
             return _next(context);
