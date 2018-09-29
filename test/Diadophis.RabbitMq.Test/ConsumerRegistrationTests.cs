@@ -57,6 +57,22 @@ namespace Diadophis.RabbitMq.Test
         }
 
         [Fact]
+        public void Rabbit_connection_factory_enables_async_consumers()
+        {
+            _serviceCollection.UseRabbitMqConsumer<TestRabbitMqConfig>(Mock.Of<IConfiguration>());
+
+            // Get the implementation factory for the connection factory, and invoke it with a 
+            // null IServiceProvider because the implementation factory shouldn't need one
+            var actual = (ConnectionFactory)_serviceCollection
+                .Single(sd => sd.ServiceType == typeof(IConnectionFactory))
+                .ImplementationFactory
+                .Invoke(null);
+
+            Assert.True(actual.DispatchConsumersAsync);
+
+        }
+
+        [Fact]
         public void Cannot_call_on_a_null_service_collection()
         {
             ServiceCollection isNull = null;
