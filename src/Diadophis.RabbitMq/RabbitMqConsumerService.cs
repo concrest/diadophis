@@ -2,10 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -17,24 +15,7 @@ namespace Diadophis.RabbitMq
     internal class RabbitMqConsumerService<TConfig> : IHostedService, IDisposable
         where TConfig : class, IRabbitMqConfig, new()
     {
-        private static class LoggingEvents
-        {
-            // 100 series - Configuration and setup
-            internal static readonly EventId Configure = new EventId(101, nameof(Configure));
 
-            // 200 series - Starting and Stopping
-            internal static readonly EventId StartAsync         = new EventId(201, nameof(StartAsync));
-            internal static readonly EventId StopAsync          = new EventId(202, nameof(StopAsync));
-            internal static readonly EventId BuildPipeline      = new EventId(203, nameof(BuildPipeline));
-            internal static readonly EventId BuildPipelineError = new EventId(204, nameof(BuildPipelineError));
-            internal static readonly EventId Disposing          = new EventId(205, nameof(Disposing));
-
-            // 300 series - Consuming messages
-            internal static readonly EventId ConsumeMessageStart  = new EventId(301, nameof(ConsumeMessageStart));
-            internal static readonly EventId ConsumeMessageEnd    = new EventId(302, nameof(ConsumeMessageEnd));
-            internal static readonly EventId ConsumerMessageError = new EventId(303, nameof(ConsumerMessageError));
-            internal static readonly EventId CallbackException    = new EventId(304, nameof(CallbackException));
-        }
 
         private readonly TConfig _config;
         private readonly ILogger<RabbitMqConsumerService<TConfig>> _logger;
@@ -42,7 +23,6 @@ namespace Diadophis.RabbitMq
         private readonly IRabbitMqPipelineProvider _pipelineProvider;
 
         private bool _isDisposed = false;
-        private MessageDelegate _pipeline;
         private IConnection _connection;
         private IModel _channel;
 
@@ -65,6 +45,7 @@ namespace Diadophis.RabbitMq
             _logger.LogInformation(LoggingEvents.StartAsync, "Starting RabbitMqConsumerService");
 
             _pipelineProvider.Initialise(_config);
+
             StartConsumingMessages();
 
             return Task.CompletedTask;
@@ -104,9 +85,8 @@ namespace Diadophis.RabbitMq
             _logger.LogDebug(LoggingEvents.ConsumeMessageStart, "Started consuming message");
             try
             {
+                // TODO: Pass _channel in too so middleware can Ack or Reject
                 await _pipelineProvider.InvokePipeline(message);
-
-                // TODO: Where is best to Ack or Reject the message?
 
                 _logger.LogDebug(LoggingEvents.ConsumeMessageEnd, 
                     "Finished consuming message");
@@ -144,6 +124,25 @@ namespace Diadophis.RabbitMq
 
             // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
             Dispose(true);
+        }
+
+        private static class LoggingEvents
+        {
+            // 100 series - Configuration and setup
+            internal static readonly EventId Configure = new EventId(101, nameof(Configure));
+
+            // 200 series - Starting and Stopping
+            internal static readonly EventId StartAsync = new EventId(201, nameof(StartAsync));
+            internal static readonly EventId StopAsync = new EventId(202, nameof(StopAsync));
+            internal static readonly EventId BuildPipeline = new EventId(203, nameof(BuildPipeline));
+            internal static readonly EventId BuildPipelineError = new EventId(204, nameof(BuildPipelineError));
+            internal static readonly EventId Disposing = new EventId(205, nameof(Disposing));
+
+            // 300 series - Consuming messages
+            internal static readonly EventId ConsumeMessageStart = new EventId(301, nameof(ConsumeMessageStart));
+            internal static readonly EventId ConsumeMessageEnd = new EventId(302, nameof(ConsumeMessageEnd));
+            internal static readonly EventId ConsumerMessageError = new EventId(303, nameof(ConsumerMessageError));
+            internal static readonly EventId CallbackException = new EventId(304, nameof(CallbackException));
         }
     }
 }

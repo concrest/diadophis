@@ -7,7 +7,7 @@ using RabbitMQ.Client;
 
 namespace Diadophis.RabbitMq.Test
 {
-    class TestRabbitMqConfig : IRabbitMqConfig
+    public class TestRabbitMqConfig : IRabbitMqConfig
     {
         public List<MessageContext> MessagesReceived { get; } = new List<MessageContext>();
 

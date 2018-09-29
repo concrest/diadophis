@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
+using Moq;
 
 namespace Diadophis.RabbitMq.Test
 {
@@ -15,7 +16,7 @@ namespace Diadophis.RabbitMq.Test
 
         public IDisposable BeginScope<TState>(TState state)
         {
-            throw new NotImplementedException();
+            return Mock.Of<IDisposable>();
         }
 
         public bool IsEnabled(LogLevel logLevel)
