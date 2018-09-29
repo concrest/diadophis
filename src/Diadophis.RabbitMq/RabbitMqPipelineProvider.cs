@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
 namespace Diadophis.RabbitMq
@@ -52,9 +53,9 @@ namespace Diadophis.RabbitMq
             }
         }
 
-        public Task InvokePipeline(BasicDeliverEventArgs message)
+        public Task InvokePipeline(IModel channel, BasicDeliverEventArgs message)
         {
-            return _pipeline.Invoke(new RabbitMqMessageContext(_serviceProvider, message));
+            return _pipeline.Invoke(new RabbitMqMessageContext(_serviceProvider, channel, message));
         }
     }
 }

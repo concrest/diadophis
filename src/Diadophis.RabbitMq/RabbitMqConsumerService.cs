@@ -15,8 +15,6 @@ namespace Diadophis.RabbitMq
     internal class RabbitMqConsumerService<TConfig> : IHostedService, IDisposable
         where TConfig : class, IRabbitMqConfig, new()
     {
-
-
         private readonly TConfig _config;
         private readonly ILogger<RabbitMqConsumerService<TConfig>> _logger;
         private readonly IConnectionFactory _connectionFactory;
@@ -54,6 +52,9 @@ namespace Diadophis.RabbitMq
         public Task StopAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation(LoggingEvents.StopAsync, "Stopping RabbitMqConsumerService");
+                        
+            _channel?.Close();
+            _connection?.Close();
 
             return Task.CompletedTask;
         }
@@ -85,8 +86,7 @@ namespace Diadophis.RabbitMq
             _logger.LogDebug(LoggingEvents.ConsumeMessageStart, "Started consuming message");
             try
             {
-                // TODO: Pass _channel in too so middleware can Ack or Reject
-                await _pipelineProvider.InvokePipeline(message);
+                await _pipelineProvider.InvokePipeline(_channel, message);
 
                 _logger.LogDebug(LoggingEvents.ConsumeMessageEnd, 
                     "Finished consuming message");

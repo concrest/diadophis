@@ -44,16 +44,6 @@ namespace Diadophis.RabbitMq.Test
         }
 
         [Fact]
-        public async Task Consumer_starts_receiving_messages_after_service_start()
-        {
-            
-            await _sut.StartAsync(Token);
-
-            // TODO: Assertions
-
-        }
-
-        [Fact]
         public async Task Consumer_callback_exceptions_are_logged()
         {
             await _sut.StartAsync(Token);
@@ -61,6 +51,30 @@ namespace Diadophis.RabbitMq.Test
             Mock.Get(_channel).Raise(c => c.CallbackException += null, new CallbackExceptionEventArgs(new ArgumentNullException()));
 
             Assert.Contains(_logger.LogEntries, e => e.EventId.Id == 304 && e.LogLevel == LogLevel.Warning);
+        }
+
+        [Fact]
+        public async Task Stop_without_start_is_no_op()
+        {
+            await _sut.StopAsync(Token);
+
+            Assert.Contains(_logger.LogEntries, e => e.EventId.Id == 202 && e.LogLevel == LogLevel.Information);
+        }
+
+        [Fact]
+        public void Dispose_without_start_is_no_op()
+        {
+            _sut.Dispose();
+
+            Assert.Contains(_logger.LogEntries, e => e.EventId.Id == 205 && e.LogLevel == LogLevel.Trace);
+        }
+
+        [Fact]
+        public async Task Startup_logs_informational_message()
+        {
+            await _sut.StartAsync(Token);
+
+            Assert.Contains(_logger.LogEntries, e => e.EventId.Id == 201 && e.LogLevel == LogLevel.Information);
         }
     }
 }

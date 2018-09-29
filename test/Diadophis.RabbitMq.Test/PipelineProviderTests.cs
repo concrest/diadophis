@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
+using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using Xunit;
 
@@ -41,9 +42,14 @@ namespace Diadophis.RabbitMq.Test
             TestRabbitMqConfig testConfig = InitialiseSut();
 
             var message = new BasicDeliverEventArgs();
-            await _sut.InvokePipeline(message);
+            var channel = Mock.Of<IModel>();
 
-            Assert.Same(message, testConfig.MessagesReceived.Single().GetRabbitMqMessage());
+            await _sut.InvokePipeline(channel, message);
+
+            var actual = testConfig.MessagesReceived.Single();
+
+            Assert.Same(message, actual.GetRabbitMqMessage());
+            Assert.Same(channel, actual.GetRabbitMqChannel());
         }
 
         private TestRabbitMqConfig InitialiseSut()
