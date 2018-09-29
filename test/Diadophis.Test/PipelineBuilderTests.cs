@@ -4,6 +4,8 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Xunit;
 
 namespace Diadophis.Test
@@ -17,7 +19,7 @@ namespace Diadophis.Test
         public PipelineBuilderTests()
         {
             _fakeServiceProvider = new FakeServiceProvider();
-            _sut = new PipelineBuilder(_fakeServiceProvider);
+            _sut = new PipelineBuilder(_fakeServiceProvider, Mock.Of<ILogger<PipelineBuilder>>());
 
             _fakeMessageContext = new FakeMessageContext(_fakeServiceProvider);
         }

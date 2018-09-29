@@ -3,6 +3,8 @@
 
 using System;
 using Diadophis.Test.Middleware;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Xunit;
 
 namespace Diadophis.Test
@@ -16,7 +18,7 @@ namespace Diadophis.Test
         public UseMiddlewareTests()
         {
             _fakeServiceProvider = new FakeServiceProvider();
-            _sut = new PipelineBuilder(_fakeServiceProvider);
+            _sut = new PipelineBuilder(_fakeServiceProvider, Mock.Of<ILogger<PipelineBuilder>>());
 
             _fakeMessageContext = new FakeMessageContext(_fakeServiceProvider);
         }
@@ -93,7 +95,7 @@ namespace Diadophis.Test
         [Fact]
         public void UseMiddleware_throws_on_Invoke_when_service_provider_unavailable()
         {
-            var sutWithNoIoC = new PipelineBuilder(null);
+            var sutWithNoIoC = new PipelineBuilder(null, Mock.Of<ILogger<PipelineBuilder>>());
             var contextWithNoIoC = new FakeMessageContext(null);
 
             var exception = Assert.Throws<InvalidOperationException>(() =>
