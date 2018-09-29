@@ -19,7 +19,9 @@ namespace Diadophis.RabbitMq
 
             services.Configure<TRabbitConfig>(config);
 
-            services.TryAddTransient<PipelineBuilder>();
+            services.TryAddTransient<IPipelineBuilder, PipelineBuilder>();
+            services.TryAddTransient<IRabbitMqPipelineProvider, RabbitMqPipelineProvider>();
+
             services.TryAddTransient<IConnectionFactory>(_ => new ConnectionFactory { DispatchConsumersAsync = true });
 
             services.AddHostedService<RabbitMqConsumerService<TRabbitConfig>>();

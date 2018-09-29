@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,7 +39,7 @@ namespace Diadophis.RabbitMq
         private readonly TConfig _config;
         private readonly ILogger<RabbitMqConsumerService<TConfig>> _logger;
         private readonly IConnectionFactory _connectionFactory;
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IRabbitMqPipelineProvider _pipelineProvider;
 
         private bool _isDisposed = false;
         private MessageDelegate _pipeline;
@@ -48,12 +49,12 @@ namespace Diadophis.RabbitMq
         public RabbitMqConsumerService(
             IOptions<TConfig> config,
             ILogger<RabbitMqConsumerService<TConfig>> logger,
-            IServiceProvider serviceProvider,
+            IRabbitMqPipelineProvider pipelineProvider,
             IConnectionFactory connectionFactory)
         {
             _config = config.Value;
             _logger = logger;
-            _serviceProvider = serviceProvider;
+            _pipelineProvider = pipelineProvider;
             _connectionFactory = connectionFactory;
 
             _logger.BeginScope("Using configuration from {ConfigType}", _config.GetType().FullName);
@@ -61,10 +62,23 @@ namespace Diadophis.RabbitMq
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation(LoggingEvents.StartAsync,"Starting RabbitMqConsumerService");
+            _logger.LogInformation(LoggingEvents.StartAsync, "Starting RabbitMqConsumerService");
 
-            BuildPipeline();
+            _pipelineProvider.Initialise(_config);
+            StartConsumingMessages();
 
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            _logger.LogInformation(LoggingEvents.StopAsync, "Stopping RabbitMqConsumerService");
+
+            return Task.CompletedTask;
+        }
+
+        private void StartConsumingMessages()
+        {
             _connectionFactory.Uri = new Uri(_config.ConnectionUri);
 
             _connection = _connectionFactory.CreateConnection();
@@ -78,45 +92,11 @@ namespace Diadophis.RabbitMq
             };
 
             _config.ConfigureChannel(_channel);
-            
+
             var consumer = new AsyncEventingBasicConsumer(_channel);
             consumer.Received += Consumer_Received;
 
             _channel.BasicConsume(_config.QueueName, _config.AutoAck, consumer);
-
-            return Task.CompletedTask;
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            _logger.LogInformation(LoggingEvents.StopAsync, "Stopping RabbitMqConsumerService");
-
-            return Task.CompletedTask;
-        }
-
-        private void BuildPipeline()
-        {
-            _logger.LogTrace(LoggingEvents.BuildPipeline, "Building pipeline from type");
-            
-            try
-            {
-                var builder = _serviceProvider.GetRequiredService<PipelineBuilder>();
-                _config.ConfigurePipeline(builder);
-                _pipeline = builder.Build();
-            }
-            catch (Exception ex)
-            {
-                // Exception during pipeline building - probably due to missing IoC wire up
-
-                _logger.LogError(
-                    LoggingEvents.BuildPipelineError,
-                    ex,
-                    "Error building pipeline"                    
-                );
-
-                // No recovery possible.
-                throw;
-            }
         }
 
         private async Task Consumer_Received(object sender, BasicDeliverEventArgs message)
@@ -124,11 +104,12 @@ namespace Diadophis.RabbitMq
             _logger.LogDebug(LoggingEvents.ConsumeMessageStart, "Started consuming message");
             try
             {
-                await _pipeline.Invoke(new RabbitMqMessageContext(_serviceProvider, message));
+                await _pipelineProvider.InvokePipeline(message);
 
                 // TODO: Where is best to Ack or Reject the message?
 
-                _logger.LogDebug(LoggingEvents.ConsumeMessageEnd, "Finished consuming message");
+                _logger.LogDebug(LoggingEvents.ConsumeMessageEnd, 
+                    "Finished consuming message");
             }
             catch (Exception ex)
             {

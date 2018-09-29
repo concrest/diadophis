@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,24 +22,28 @@ namespace Diadophis.RabbitMq.Test
             _serviceCollection = new ServiceCollection();
         }
 
-        [Fact]
-        public void Pipeline_is_transient_if_not_already_registered()
+        [Theory]
+        [MemberData(nameof(TransientServiceRegistrationTestCases))]
+        public void Registration_wires_up_transient_services(ServiceRegistrationTestCase testCase)
         {
             _serviceCollection.UseRabbitMqConsumer<TestRabbitMqConfig>(Mock.Of<IConfiguration>());
 
-            var actual = _serviceCollection.Single(sd => sd.ServiceType == typeof(PipelineBuilder));
+            var actual = _serviceCollection.Single(sd => sd.ServiceType == testCase.ServiceType);
 
             Assert.Equal(ServiceLifetime.Transient, actual.Lifetime);
         }
 
-        [Fact]
-        public void RabbitMq_client_Connection_factory_is_transient_if_not_already_registered()
+        [Theory]
+        [MemberData(nameof(TransientServiceRegistrationTestCases))]
+        public void Registration_does_not_wire_up_multiple_services(ServiceRegistrationTestCase testCase)
         {
+
+            _serviceCollection.Add(new ServiceDescriptor(testCase.ServiceType, testCase.Instance));
             _serviceCollection.UseRabbitMqConsumer<TestRabbitMqConfig>(Mock.Of<IConfiguration>());
 
-            var actual = _serviceCollection.Single(sd => sd.ServiceType == typeof(IConnectionFactory));
+            var actual = _serviceCollection.Count(sd => sd.ServiceType == testCase.ServiceType);
 
-            Assert.Equal(ServiceLifetime.Transient, actual.Lifetime);
+            Assert.Equal(1, actual);
         }
 
         [Fact]
@@ -61,6 +66,29 @@ namespace Diadophis.RabbitMq.Test
             );
 
             Assert.Equal("services", actual.ParamName);
+        }
+
+        public static IEnumerable<object[]> TransientServiceRegistrationTestCases()
+        {
+            yield return new object[] { new ServiceRegistrationTestCase<IRabbitMqPipelineProvider>() };
+            yield return new object[] { new ServiceRegistrationTestCase<IConnectionFactory>() };
+            yield return new object[] { new ServiceRegistrationTestCase<IPipelineBuilder>() };
+        }
+
+        private class ServiceRegistrationTestCase<TServiceType> : ServiceRegistrationTestCase
+            where TServiceType : class
+        {
+            public ServiceRegistrationTestCase()
+            {
+                ServiceType = typeof(TServiceType);
+                Instance = Mock.Of<TServiceType>();
+            }
+        }
+
+        public class ServiceRegistrationTestCase
+        {
+            public Type ServiceType { get; set; }
+            public object Instance { get; set; }
         }
     }
 }
