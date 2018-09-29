@@ -22,12 +22,15 @@ namespace Diadophis.RabbitMq
             services.TryAddTransient<IPipelineBuilder, PipelineBuilder>();
             services.TryAddTransient<IRabbitMqPipelineProvider, RabbitMqPipelineProvider>();
 
-            services.TryAddTransient<IConnectionFactory>(_ => new ConnectionFactory { DispatchConsumersAsync = true });
+            services.TryAddTransient(CreateConnectionFactory);
 
             services.AddHostedService<RabbitMqConsumerService<TRabbitConfig>>();
 
             return services;
             
         }
+
+        private static IConnectionFactory CreateConnectionFactory(IServiceProvider serviceProvider)
+            => new ConnectionFactory { DispatchConsumersAsync = true };
     }
 }

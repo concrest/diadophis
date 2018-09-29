@@ -6,7 +6,7 @@ using RabbitMQ.Client.Events;
 
 namespace Diadophis.RabbitMq
 {
-    internal class RabbitMqPipelineProvider : IRabbitMqPipelineProvider
+    public class RabbitMqPipelineProvider : IRabbitMqPipelineProvider
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<RabbitMqPipelineProvider> _logger;
