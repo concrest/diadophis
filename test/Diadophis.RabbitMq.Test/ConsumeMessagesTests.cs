@@ -50,7 +50,7 @@ namespace Diadophis.RabbitMq.Test
 
             Mock.Get(_channel).Raise(c => c.CallbackException += null, new CallbackExceptionEventArgs(new ArgumentNullException()));
 
-            Assert.Contains(_logger.LogEntries, e => e.EventId.Id == 304 && e.LogLevel == LogLevel.Warning);
+            Assert.Contains(_logger.LogEntries, e => e.EventId.Id == 204 && e.LogLevel == LogLevel.Warning);
         }
 
         [Fact]
@@ -58,7 +58,7 @@ namespace Diadophis.RabbitMq.Test
         {
             await _sut.StopAsync(Token);
 
-            Assert.Contains(_logger.LogEntries, e => e.EventId.Id == 202 && e.LogLevel == LogLevel.Information);
+            Assert.Contains(_logger.LogEntries, e => e.EventId.Id == 102 && e.LogLevel == LogLevel.Information);
         }
 
         [Fact]
@@ -66,7 +66,7 @@ namespace Diadophis.RabbitMq.Test
         {
             _sut.Dispose();
 
-            Assert.Contains(_logger.LogEntries, e => e.EventId.Id == 205 && e.LogLevel == LogLevel.Trace);
+            Assert.Contains(_logger.LogEntries, e => e.EventId.Id == 103 && e.LogLevel == LogLevel.Trace);
         }
 
         [Fact]
@@ -74,7 +74,7 @@ namespace Diadophis.RabbitMq.Test
         {
             await _sut.StartAsync(Token);
 
-            Assert.Contains(_logger.LogEntries, e => e.EventId.Id == 201 && e.LogLevel == LogLevel.Information);
+            Assert.Contains(_logger.LogEntries, e => e.EventId.Id == 101 && e.LogLevel == LogLevel.Information);
         }
     }
 }

@@ -1,17 +1,18 @@
 ﻿// Copyright 2018 Concrest
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using Diadophis.RabbitMq;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Diadophis.Kafka;
+using Microsoft.Extensions.Configuration;
 
-namespace SimpleRabbitMqService
+namespace SimpleKafkaConsumer
 {
     public class Startup
     {
+
         private readonly IConfiguration _config;
 
         public Startup(IConfiguration config)
@@ -23,9 +24,7 @@ namespace SimpleRabbitMqService
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services
-                .UseMyDependencies()
-                .UseRabbitMqConsumer<SimpleRabbitMqConfig>(_config.GetSection("SimpleRabbitMqConfig"));
+            services.AddKafkaConsumer<SimpleKafkaConfig>(_config.GetSection("SimpleKafkaConfig"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -35,8 +34,6 @@ namespace SimpleRabbitMqService
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            // TODO: Add HTTP handling as required
 
             app.Run(async (context) =>
             {

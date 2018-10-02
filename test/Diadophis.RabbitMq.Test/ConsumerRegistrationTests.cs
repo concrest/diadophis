@@ -26,7 +26,7 @@ namespace Diadophis.RabbitMq.Test
         [MemberData(nameof(TransientServiceRegistrationTestCases))]
         public void Registration_wires_up_transient_services(ServiceRegistrationTestCase testCase)
         {
-            _serviceCollection.UseRabbitMqConsumer<TestRabbitMqConfig>(Mock.Of<IConfiguration>());
+            _serviceCollection.AddRabbitMqConsumer<TestRabbitMqConfig>(Mock.Of<IConfiguration>());
 
             var actual = _serviceCollection.Single(sd => sd.ServiceType == testCase.ServiceType);
 
@@ -39,7 +39,7 @@ namespace Diadophis.RabbitMq.Test
         {
 
             _serviceCollection.Add(new ServiceDescriptor(testCase.ServiceType, testCase.Instance));
-            _serviceCollection.UseRabbitMqConsumer<TestRabbitMqConfig>(Mock.Of<IConfiguration>());
+            _serviceCollection.AddRabbitMqConsumer<TestRabbitMqConfig>(Mock.Of<IConfiguration>());
 
             var actual = _serviceCollection.Count(sd => sd.ServiceType == testCase.ServiceType);
 
@@ -49,7 +49,7 @@ namespace Diadophis.RabbitMq.Test
         [Fact]
         public void Consumer_service_is_a_hosted_service()
         {
-            _serviceCollection.UseRabbitMqConsumer<TestRabbitMqConfig>(Mock.Of<IConfiguration>());
+            _serviceCollection.AddRabbitMqConsumer<TestRabbitMqConfig>(Mock.Of<IConfiguration>());
 
             var actual = _serviceCollection.Single(sd => sd.ImplementationType == typeof(RabbitMqConsumerService<TestRabbitMqConfig>));
 
@@ -59,7 +59,7 @@ namespace Diadophis.RabbitMq.Test
         [Fact]
         public void Rabbit_connection_factory_enables_async_consumers()
         {
-            _serviceCollection.UseRabbitMqConsumer<TestRabbitMqConfig>(Mock.Of<IConfiguration>());
+            _serviceCollection.AddRabbitMqConsumer<TestRabbitMqConfig>(Mock.Of<IConfiguration>());
 
             // Get the implementation factory for the connection factory, and invoke it with a 
             // null IServiceProvider because the implementation factory shouldn't need one
@@ -78,7 +78,7 @@ namespace Diadophis.RabbitMq.Test
             ServiceCollection isNull = null;
 
             var actual = Assert.Throws<ArgumentNullException>(
-                () => isNull.UseRabbitMqConsumer<TestRabbitMqConfig>(Mock.Of<IConfiguration>())
+                () => isNull.AddRabbitMqConsumer<TestRabbitMqConfig>(Mock.Of<IConfiguration>())
             );
 
             Assert.Equal("services", actual.ParamName);

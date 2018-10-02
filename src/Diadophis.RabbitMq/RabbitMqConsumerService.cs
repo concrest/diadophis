@@ -93,10 +93,11 @@ namespace Diadophis.RabbitMq
             }
             catch (Exception ex)
             {
-                _logger.LogError(LoggingEvents.ConsumerMessageError,
+                _logger.LogError(LoggingEvents.ConsumeMessageError,
                     ex,
                     "Error consuming message");
 
+                // TODO: What should we do with unhandled exceptions?
                 throw;
             }
         }
@@ -128,21 +129,16 @@ namespace Diadophis.RabbitMq
 
         private static class LoggingEvents
         {
-            // 100 series - Configuration and setup
-            internal static readonly EventId Configure = new EventId(101, nameof(Configure));
+            // 100 series - Starting and Stopping
+            internal static readonly EventId StartAsync = new EventId(101, nameof(StartAsync));
+            internal static readonly EventId StopAsync = new EventId(102, nameof(StopAsync));
+            internal static readonly EventId Disposing = new EventId(103, nameof(Disposing));
 
-            // 200 series - Starting and Stopping
-            internal static readonly EventId StartAsync = new EventId(201, nameof(StartAsync));
-            internal static readonly EventId StopAsync = new EventId(202, nameof(StopAsync));
-            internal static readonly EventId BuildPipeline = new EventId(203, nameof(BuildPipeline));
-            internal static readonly EventId BuildPipelineError = new EventId(204, nameof(BuildPipelineError));
-            internal static readonly EventId Disposing = new EventId(205, nameof(Disposing));
-
-            // 300 series - Consuming messages
-            internal static readonly EventId ConsumeMessageStart = new EventId(301, nameof(ConsumeMessageStart));
-            internal static readonly EventId ConsumeMessageEnd = new EventId(302, nameof(ConsumeMessageEnd));
-            internal static readonly EventId ConsumerMessageError = new EventId(303, nameof(ConsumerMessageError));
-            internal static readonly EventId CallbackException = new EventId(304, nameof(CallbackException));
+            // 200 series - Consuming messages
+            internal static readonly EventId ConsumeMessageStart = new EventId(201, nameof(ConsumeMessageStart));
+            internal static readonly EventId ConsumeMessageEnd = new EventId(202, nameof(ConsumeMessageEnd));
+            internal static readonly EventId ConsumeMessageError = new EventId(203, nameof(ConsumeMessageError));
+            internal static readonly EventId CallbackException = new EventId(204, nameof(CallbackException));
         }
     }
 }

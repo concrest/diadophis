@@ -13,8 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Diadophis.RabbitMq\Diadophis.RabbitMq.csproj" />
-    <ProjectReference Include="..\..\src\Diadophis\Diadophis.csproj" />
+    <ProjectReference Include="..\..\..\src\Diadophis.Kafka\Diadophis.Kafka.csproj" />
+    <ProjectReference Include="..\..\..\src\Diadophis\Diadophis.csproj" />
   </ItemGroup>
 
   <ItemGroup>

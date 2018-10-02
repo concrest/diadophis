@@ -11,7 +11,7 @@ namespace Diadophis.RabbitMq
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection UseRabbitMqConsumer<TRabbitConfig>(this IServiceCollection services,
+        public static IServiceCollection AddRabbitMqConsumer<TRabbitConfig>(this IServiceCollection services,
             IConfiguration config)
             where TRabbitConfig : class, IRabbitMqConfig, new()
         {
