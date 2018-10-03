@@ -83,7 +83,6 @@ namespace Diadophis.Kafka
                         consumeResult.Value,
                         consumeResult.Offset);
 
-                    // TODO: How to make this async/await all the way down?
                     await _pipelineProvider.InvokePipeline<Ignore, string>(consumeResult);
 
                     // TODO: Figure out how to create an extension method for this
@@ -94,22 +93,17 @@ namespace Diadophis.Kafka
                         consumeResult.Value,
                         consumeResult.Offset);
                 }
-                catch (ConsumeException ce)
+                catch (OperationCanceledException oce)
                 {
-                    _logger.LogError(LoggingEvents.ConsumeMessageException,
-                        ce,
-                        "Error consuming message");
-
-                    // Example on GitHub swallows these?
+                    _logger.LogWarning(LoggingEvents.ConsumeMessageCancelled,
+                        oce,
+                        "Message consumer was cancelled");
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(LoggingEvents.ConsumeMessageException,
                         ex,
                         "Error consuming message");
-
-                    // TODO: What should we do with unhandled exceptions? Ignore?
-                    //throw;
                 }
             }
 
@@ -119,16 +113,6 @@ namespace Diadophis.Kafka
         public Task StopAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation(LoggingEvents.StartAsync, "Stopping KafkaConsumerService");
-
-            if (_consumerTask != null)
-            {
-                if (!Task.WaitAll(new[] { _consumerTask }, StopTaskWaitTimeoutMillis))
-                {
-                    _logger.LogWarning(LoggingEvents.ConsumerTaskNotStopped,
-                        "Consumer task didn't stop after {StopTaskWaitTimeoutMillis}",
-                        StopTaskWaitTimeoutMillis);
-                }
-            }
 
             _consumer?.Close();
 
@@ -171,7 +155,7 @@ namespace Diadophis.Kafka
             internal static readonly EventId ConsumerOnErrorEvent = new EventId(204, nameof(ConsumerOnErrorEvent));
             internal static readonly EventId EndOfPartition = new EventId(205, nameof(EndOfPartition));
             internal static readonly EventId ExitedConsumerLoop = new EventId(206, nameof(ExitedConsumerLoop));
-            internal static readonly EventId ConsumerTaskNotStopped = new EventId(207, nameof(ConsumerTaskNotStopped));
+            internal static readonly EventId ConsumeMessageCancelled = new EventId(207, nameof(ConsumeMessageCancelled));
         }
     }
 }
