@@ -35,7 +35,7 @@ namespace Diadophis.RabbitMq
             _pipelineProvider = pipelineProvider;
             _connectionFactory = connectionFactory;
 
-            _logger.BeginScope("Using configuration from {ConfigType}", _config.GetType().FullName);
+            _logger.BeginScope("ConfigType:{ConfigType}", _config.GetType().FullName);
         }
 
         public Task StartAsync(CancellationToken cancellationToken)

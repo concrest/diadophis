@@ -14,12 +14,14 @@ namespace Diadophis.Kafka
     internal class KafkaConsumerService<TConfig> : IHostedService, IDisposable
         where TConfig : class, IKafkaConfig, new()
     {
+        private const int StopTaskWaitTimeoutMillis = 5000;
+
         private bool _isDisposed = false;
 
         private readonly ILogger<KafkaConsumerService<TConfig>> _logger;
         private readonly TConfig _config;
         private readonly IKafkaPipelineProvider _pipelineProvider;
-
+        
         private Consumer<Ignore, string> _consumer;
         private Task _consumerTask;
 
@@ -32,7 +34,7 @@ namespace Diadophis.Kafka
             _config = config.Value;
             _pipelineProvider = pipelineProvider;
 
-            _logger.BeginScope("Using configuration from {ConfigType}", _config.GetType().FullName);
+            _logger.BeginScope("ConfigType:{ConfigType}", _config.GetType().FullName);
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -41,13 +43,12 @@ namespace Diadophis.Kafka
 
             _pipelineProvider.Initialise(_config);
 
-            // TODO: Is this wise?
             _consumerTask = Task.Run(() => StartKafkaConsumer(cancellationToken));
 
             return Task.CompletedTask;
         }
 
-        private void StartKafkaConsumer(CancellationToken cancellationToken)
+        private async Task StartKafkaConsumer(CancellationToken cancellationToken)
         {
             var config = new ConsumerConfig
             {
@@ -66,16 +67,6 @@ namespace Diadophis.Kafka
                 _logger.LogErrorEvent(LoggingEvents.ConsumerOnErrorEvent, e);
             };
 
-            _consumer.OnPartitionEOF += (_, topicPartitionOffset) =>
-            {
-                // TODO: Decide if this is Info, Debug, or Warn
-                _logger.LogInformation(
-                    LoggingEvents.EndOfPartition,
-                    "End of partition Code: topicPartitionOffset: {TopicPartitionOffset}",
-                    topicPartitionOffset);
-            };
-
-            // An array? What happens with > 1 topic? We get all messages from all topics?
             _consumer.Subscribe(_config.Topics);
 
             while (!cancellationToken.IsCancellationRequested)
@@ -86,17 +77,19 @@ namespace Diadophis.Kafka
 
                     // TODO: Figure out how to create an extension method for this
                     _logger.LogDebug(LoggingEvents.ConsumeMessageStart,
-                        "Started consuming message. Key: {Key}, Value: {Value}, Offset: {Offset}",
+                        "Started consuming message. Topic: {Topic}, Key: {Key}, Value: {Value}, Offset: {Offset}",
+                        consumeResult.Topic,
                         consumeResult.Key,
                         consumeResult.Value,
                         consumeResult.Offset);
 
                     // TODO: How to make this async/await all the way down?
-                    _pipelineProvider.InvokePipeline<Ignore, string>(consumeResult).ConfigureAwait(false).GetAwaiter();
+                    await _pipelineProvider.InvokePipeline<Ignore, string>(consumeResult);
 
                     // TODO: Figure out how to create an extension method for this
                     _logger.LogDebug(LoggingEvents.ConsumeMessageEnd,
-                        "Started consuming message. Key: {Key}, Value: {Value}, Offset: {Offset}",
+                        "Started consuming message. Topic: {Topic}, Key: {Key}, Value: {Value}, Offset: {Offset}",
+                        consumeResult.Topic, 
                         consumeResult.Key,
                         consumeResult.Value,
                         consumeResult.Offset);
@@ -115,7 +108,7 @@ namespace Diadophis.Kafka
                         ex,
                         "Error consuming message");
 
-                    // TODO: What should we do with unhandled exceptions? Ignore
+                    // TODO: What should we do with unhandled exceptions? Ignore?
                     //throw;
                 }
             }
@@ -126,8 +119,17 @@ namespace Diadophis.Kafka
         public Task StopAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation(LoggingEvents.StartAsync, "Stopping KafkaConsumerService");
-            
-            // TODO: Check _consumerTask status. 
+
+            if (_consumerTask != null)
+            {
+                if (!Task.WaitAll(new[] { _consumerTask }, StopTaskWaitTimeoutMillis))
+                {
+                    _logger.LogWarning(LoggingEvents.ConsumerTaskNotStopped,
+                        "Consumer task didn't stop after {StopTaskWaitTimeoutMillis}",
+                        StopTaskWaitTimeoutMillis);
+                }
+            }
+
             _consumer?.Close();
 
             return Task.CompletedTask;
@@ -139,11 +141,9 @@ namespace Diadophis.Kafka
             {
                 if (disposing)
                 {
-                    // TODO: dispose managed state (managed objects).
+                    _consumer?.Dispose();
+                    _consumer = null;
                 }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-                // TODO: set large fields to null.
 
                 _isDisposed = true;
             }
@@ -171,6 +171,7 @@ namespace Diadophis.Kafka
             internal static readonly EventId ConsumerOnErrorEvent = new EventId(204, nameof(ConsumerOnErrorEvent));
             internal static readonly EventId EndOfPartition = new EventId(205, nameof(EndOfPartition));
             internal static readonly EventId ExitedConsumerLoop = new EventId(206, nameof(ExitedConsumerLoop));
+            internal static readonly EventId ConsumerTaskNotStopped = new EventId(207, nameof(ConsumerTaskNotStopped));
         }
     }
 }

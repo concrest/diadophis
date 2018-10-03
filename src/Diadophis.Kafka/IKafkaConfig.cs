@@ -9,8 +9,8 @@ namespace Diadophis.Kafka
     public interface IKafkaConfig
     {
         string BrokerUrls { get; set; }
-        string ConsumerGroupId { get; }
-        IEnumerable<string> Topics { get; }
+        string ConsumerGroupId { get; set; }
+        string[] Topics { get; set; }
 
         void ConfigurePipeline(IPipelineBuilder pipe);
         void ConfigureConsumer(ConsumerConfig config);
