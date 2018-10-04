@@ -36,7 +36,9 @@ namespace SimpleKafkaConsumer
             }
             else
             {
-                logBuilder.WriteTo.Console();
+                logBuilder.WriteTo.Console(
+                    outputTemplate: "[{Timestamp:HH:mm:ss.fff} {Level:u3}] {Message:lj}{NewLine}{Exception}"
+                );
             }
 
             // Create logger here so fatal logs can be captured
