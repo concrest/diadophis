@@ -33,13 +33,11 @@ namespace Diadophis.Kafka
             _logger = logger;
             _config = config.Value;
             _pipelineProvider = pipelineProvider;
-
-            _logger.BeginScope("ConfigType:{ConfigType}", _config.GetType().FullName);
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation(LoggingEvents.StartAsync, "Starting KafkaConsumerService");
+            _logger.LogStart(LoggingEvents.StartAsync, _config);
 
             _pipelineProvider.Initialise(_config);
 
@@ -75,23 +73,11 @@ namespace Diadophis.Kafka
                 {
                     var consumeResult = _consumer.Consume(cancellationToken);
 
-                    // TODO: Figure out how to create an extension method for this
-                    _logger.LogDebug(LoggingEvents.ConsumeMessageStart,
-                        "Started consuming message. Topic: {Topic}, Key: {Key}, Value: {Value}, Offset: {Offset}",
-                        consumeResult.Topic,
-                        consumeResult.Key,
-                        consumeResult.Value,
-                        consumeResult.Offset);
+                    _logger.LogKafkaMessage(LoggingEvents.ConsumeMessageStart, "Received message", consumeResult);
 
                     await _pipelineProvider.InvokePipeline<Ignore, string>(consumeResult);
 
-                    // TODO: Figure out how to create an extension method for this
-                    _logger.LogDebug(LoggingEvents.ConsumeMessageEnd,
-                        "Started consuming message. Topic: {Topic}, Key: {Key}, Value: {Value}, Offset: {Offset}",
-                        consumeResult.Topic, 
-                        consumeResult.Key,
-                        consumeResult.Value,
-                        consumeResult.Offset);
+                    _logger.LogKafkaMessage(LoggingEvents.ConsumeMessageEnd, "Finished with message", consumeResult);                    
                 }
                 catch (OperationCanceledException oce)
                 {

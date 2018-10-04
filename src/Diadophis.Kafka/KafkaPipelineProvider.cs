@@ -11,7 +11,6 @@ namespace Diadophis.Kafka
 {
     internal class KafkaPipelineProvider : IKafkaPipelineProvider
     {
-
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<KafkaPipelineProvider> _logger;
 

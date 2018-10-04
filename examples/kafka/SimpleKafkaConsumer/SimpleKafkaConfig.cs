@@ -41,11 +41,7 @@ namespace SimpleKafkaConsumer
 
         public void ConfigurePipeline(IPipelineBuilder pipe)
         {
-            // TODO: middleware here
-            pipe.Run(msg =>
-            {
-                return Task.CompletedTask;
-            });
+            pipe.UseMiddleware<ExampleMiddleware>();
         }
     }
 }
