@@ -9,10 +9,10 @@ using Microsoft.Extensions.Logging;
 
 namespace SimpleKafkaConsumer
 {
-    public class ExampleMiddleware
+    public class ExampleMiddleware<TKey, TValue>
     {
         private readonly MessageDelegate _next;
-        private readonly ILogger<ExampleMiddleware> _logger;
+        private readonly ILogger<ExampleMiddleware<TKey, TValue>> _logger;
 
         /// <summary>
         /// Constructor for middleware must have the first argument be a MessageDelegate for the 
@@ -22,7 +22,7 @@ namespace SimpleKafkaConsumer
         /// </summary>
         /// <param name="next">The next delegate in the pipeline</param>
         /// <param name="dependency">A class level dependency, created once per middleware object</param>
-        public ExampleMiddleware(MessageDelegate next, ILogger<ExampleMiddleware> logger)
+        public ExampleMiddleware(MessageDelegate next, ILogger<ExampleMiddleware<TKey, TValue>> logger)
         {
             _next = next;
             _logger = logger;
@@ -42,7 +42,7 @@ namespace SimpleKafkaConsumer
         public Task InvokeAsync(MessageContext context)
         {
             // You can access the message from Kafka here:
-            var kafkaMessage = context.GetKafkaMessage<Ignore, string>();
+            var kafkaMessage = context.GetKafkaMessage<TKey, TValue>();
 
             _logger.LogDebug("InvokeAsync called in middleware for {Value}", kafkaMessage.Value);
 

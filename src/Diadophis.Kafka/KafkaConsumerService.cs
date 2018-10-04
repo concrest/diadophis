@@ -14,7 +14,8 @@ namespace Diadophis.Kafka
     internal class KafkaConsumerService<TConfig> : IHostedService, IDisposable
         where TConfig : class, IKafkaConfig, new()
     {
-        private const int StopTaskWaitTimeoutMillis = 5000;
+        // Same 100 millisecond timeout as in https://github.com/confluentinc/confluent-kafka-dotnet/blob/master/src/Confluent.Kafka/Consumer.cs
+        private static readonly TimeSpan ConsumeTimeout = TimeSpan.FromMilliseconds(100);
 
         private bool _isDisposed = false;
 
@@ -71,19 +72,20 @@ namespace Diadophis.Kafka
             {
                 try
                 {
-                    var consumeResult = _consumer.Consume(cancellationToken);
+                    // .Consume(CancellationToken) uses an infinite loop and ThrowIfCancellationRequested
+                    // So use the timeout and loop back until IsCancellationRequested 
+                    var consumeResult = _consumer.Consume(ConsumeTimeout);
+                    if (consumeResult == null)
+                    {
+                        // Nothing this time.
+                        continue;
+                    }
 
                     _logger.LogKafkaMessage(LoggingEvents.ConsumeMessageStart, "Received message", consumeResult);
 
-                    await _pipelineProvider.InvokePipeline<Ignore, string>(consumeResult);
+                    await _pipelineProvider.InvokePipeline(consumeResult);
 
                     _logger.LogKafkaMessage(LoggingEvents.ConsumeMessageEnd, "Finished with message", consumeResult);                    
-                }
-                catch (OperationCanceledException oce)
-                {
-                    _logger.LogWarning(LoggingEvents.ConsumeMessageCancelled,
-                        oce,
-                        "Message consumer was cancelled");
                 }
                 catch (Exception ex)
                 {
@@ -98,7 +100,7 @@ namespace Diadophis.Kafka
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation(LoggingEvents.StartAsync, "Stopping KafkaConsumerService");
+            _logger.LogInformation(LoggingEvents.StopAsync, "Stopping KafkaConsumerService");
 
             _consumer?.Close();
 
@@ -139,9 +141,7 @@ namespace Diadophis.Kafka
             internal static readonly EventId ConsumeMessageEnd = new EventId(202, nameof(ConsumeMessageEnd));
             internal static readonly EventId ConsumeMessageException = new EventId(203, nameof(ConsumeMessageException));
             internal static readonly EventId ConsumerOnErrorEvent = new EventId(204, nameof(ConsumerOnErrorEvent));
-            internal static readonly EventId EndOfPartition = new EventId(205, nameof(EndOfPartition));
-            internal static readonly EventId ExitedConsumerLoop = new EventId(206, nameof(ExitedConsumerLoop));
-            internal static readonly EventId ConsumeMessageCancelled = new EventId(207, nameof(ConsumeMessageCancelled));
+            internal static readonly EventId ExitedConsumerLoop = new EventId(205, nameof(ExitedConsumerLoop));
         }
     }
 }

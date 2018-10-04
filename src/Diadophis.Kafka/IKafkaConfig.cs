@@ -1,7 +1,6 @@
 ﻿// Copyright 2018 Concrest
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using System.Collections.Generic;
 using Confluent.Kafka;
 
 namespace Diadophis.Kafka
@@ -12,7 +11,9 @@ namespace Diadophis.Kafka
         string ConsumerGroupId { get; set; }
         string[] Topics { get; set; }
 
-        void ConfigurePipeline(IPipelineBuilder pipe);
         void ConfigureConsumer(ConsumerConfig config);
+
+        void ConfigurePipeline(IPipelineBuilder pipe);
+        
     }
 }

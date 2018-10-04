@@ -8,9 +8,10 @@ using Diadophis.Kafka;
 
 namespace SimpleKafkaConsumer
 {
-    internal class SimpleKafkaConfig : IKafkaConfig
+    internal class SimpleKafkaConfig : BasicConsumerConfig<Ignore, string>
     {
-        // BrokerUrls, ConsumerGroupId, Topics are set from appsettings.json or appsettings.{Environment}.json
+        // BrokerUrls, ConsumerGroupId, Topics from BasicConsumerConfig 
+        // are set from appsettings.json or appsettings.{Environment}.json
         // Alternatively from environment variables:
         //
         // Simple strings: 
@@ -26,22 +27,10 @@ namespace SimpleKafkaConsumer
         // See:
         //   - https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/index?view=aspnetcore-2.1
         //   - https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options?view=aspnetcore-2.1
-
-        public string BrokerUrls { get; set; }
-
-        public string ConsumerGroupId { get; set; }
-
-        public string[] Topics { get; set; }
-
-        public void ConfigureConsumer(ConsumerConfig config)
+        
+        public override void ConfigurePipeline(IPipelineBuilder pipe)
         {
-            config.EnableAutoCommit = true;
-            config.AutoOffsetReset = AutoOffsetResetType.Earliest;
-        }
-
-        public void ConfigurePipeline(IPipelineBuilder pipe)
-        {
-            pipe.UseMiddleware<ExampleMiddleware>();
+            pipe.UseMiddleware<ExampleMiddleware<Ignore, string>>();
         }
     }
 }
