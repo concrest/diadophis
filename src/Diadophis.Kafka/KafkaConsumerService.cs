@@ -11,21 +11,16 @@ using Microsoft.Extensions.Options;
 
 namespace Diadophis.Kafka
 {
-    internal class KafkaConsumerService<TConfig> : IHostedService, IDisposable
+    internal class KafkaConsumerService<TConfig> : BackgroundService
         where TConfig : class, IKafkaConfig, new()
     {
         // Same 100 millisecond timeout as in https://github.com/confluentinc/confluent-kafka-dotnet/blob/master/src/Confluent.Kafka/Consumer.cs
         private static readonly TimeSpan ConsumeTimeout = TimeSpan.FromMilliseconds(100);
 
-        private bool _isDisposed = false;
-
         private readonly ILogger<KafkaConsumerService<TConfig>> _logger;
         private readonly TConfig _config;
         private readonly IKafkaPipelineProvider _pipelineProvider;
         
-        private Consumer<Ignore, string> _consumer;
-        private Task _consumerTask;
-
         public KafkaConsumerService(
             ILogger<KafkaConsumerService<TConfig>> logger,
             IOptions<TConfig> config,
@@ -36,16 +31,15 @@ namespace Diadophis.Kafka
             _pipelineProvider = pipelineProvider;
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogStart(LoggingEvents.StartAsync, _config);
 
             _pipelineProvider.Initialise(_config);
 
-            _consumerTask = Task.Run(() => StartKafkaConsumer(cancellationToken));
-
-            return Task.CompletedTask;
+            return Task.Run(() => StartKafkaConsumer(stoppingToken));
         }
+
 
         private async Task StartKafkaConsumer(CancellationToken cancellationToken)
         {
@@ -57,87 +51,60 @@ namespace Diadophis.Kafka
              * 
              * Need better abstraction around the consumer!
              * 
-             */ 
+             */
 
 
-            var config = new ConsumerConfig
+            var consumerConfig = new ConsumerConfig
             {
                 BootstrapServers = _config.BrokerUrls,
                 GroupId = _config.ConsumerGroupId
             };
 
-            _config.ConfigureConsumer(config);
+            _config.ConfigureConsumer(consumerConfig);
 
             // TODO: Needs refactoring to use DI
             // But how to specify key and value type since different consumers will need different schemas (when using Avro)
-            _consumer = new Consumer<Ignore, string>(config);
-
-            _consumer.OnError += (_, e) =>
+            using (var consumer = new Consumer<Ignore, string>(consumerConfig))
             {
-                _logger.LogErrorEvent(LoggingEvents.ConsumerOnErrorEvent, e);
-            };
 
-            _consumer.Subscribe(_config.Topics);
-
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                try
+                consumer.OnError += (_, e) =>
                 {
-                    // .Consume(CancellationToken) uses an infinite loop and ThrowIfCancellationRequested
-                    // So use the timeout and loop back until IsCancellationRequested 
-                    var consumeResult = _consumer.Consume(ConsumeTimeout);
-                    if (consumeResult == null)
+                    _logger.LogErrorEvent(LoggingEvents.ConsumerOnErrorEvent, e);
+                };
+
+                consumer.Subscribe(_config.Topics);
+
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    try
                     {
-                        // Nothing this time.
-                        continue;
+                        // .Consume(CancellationToken) uses an infinite loop and ThrowIfCancellationRequested
+                        // So use the timeout and loop back until IsCancellationRequested 
+                        var consumeResult = consumer.Consume(ConsumeTimeout);
+                        if (consumeResult == null)
+                        {
+                            // Nothing this time.
+                            continue;
+                        }
+
+                        _logger.LogKafkaMessage(LoggingEvents.ConsumeMessageStart, "Received message", consumeResult);
+
+                        await _pipelineProvider.InvokePipeline(consumeResult);
+
+                        _logger.LogKafkaMessage(LoggingEvents.ConsumeMessageEnd, "Finished with message", consumeResult);
                     }
-
-                    _logger.LogKafkaMessage(LoggingEvents.ConsumeMessageStart, "Received message", consumeResult);
-
-                    await _pipelineProvider.InvokePipeline(consumeResult);
-
-                    _logger.LogKafkaMessage(LoggingEvents.ConsumeMessageEnd, "Finished with message", consumeResult);                    
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(LoggingEvents.ConsumeMessageException,
+                            ex,
+                            "Error consuming message");
+                    }
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogError(LoggingEvents.ConsumeMessageException,
-                        ex,
-                        "Error consuming message");
-                }
+
+                consumer.Close();
+
+                _logger.LogDebug(LoggingEvents.ExitedConsumerLoop, "Exited consumer loop");
             }
-
-            _logger.LogDebug(LoggingEvents.ExitedConsumerLoop, "Exited consumer loop");
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            _logger.LogInformation(LoggingEvents.StopAsync, "Stopping KafkaConsumerService");
-
-            _consumer?.Close();
-
-            return Task.CompletedTask;
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_isDisposed)
-            {
-                if (disposing)
-                {
-                    _consumer?.Dispose();
-                    _consumer = null;
-                }
-
-                _isDisposed = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            _logger.LogTrace(LoggingEvents.Disposing, "Disposing");
-
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
         }
 
         private static class LoggingEvents
