@@ -1,0 +1,38 @@
+{
+  "namespace": "SchemaExamples.Model",
+  "type": "record",
+  "name": "HttpRequest",
+  "fields": [
+    {
+      "name": "request_verb",
+      "doc": "HTTP verb",
+      "type": {
+        "type": "enum",
+        "name": "HttpVerbs",
+        "symbols": [ "Get", "Post", "Put", "Delete", "Head", "Options" ]
+      },
+      "default": "Get"
+    },
+    {
+      "name": "path",
+      "type": "string",
+      "doc": "The path to the resource"
+    },
+    {
+      "name": "user_agent",
+      "type": "string",
+      "doc": "The user agent that made the request"
+    },
+    {
+      "name": "timestamp",
+      "doc": "UTC time the request was made",
+      "type": "long",
+      "logicalType": "timestamp-millis"
+    },
+    {
+      "name": "duration",
+      "doc": "Millisecond duration for the completion of the request",
+      "type": "double"
+    }
+  ]
+}
