@@ -37,9 +37,9 @@ namespace Diadophis.Kafka
 
             _pipelineProvider.Initialise(_config);
 
+            // TODO: Would it make sense to pass the CancellationToken to Task.Run as well?
             return Task.Run(() => StartKafkaConsumer(stoppingToken));
         }
-
 
         private async Task StartKafkaConsumer(CancellationToken cancellationToken)
         {
@@ -89,9 +89,21 @@ namespace Diadophis.Kafka
 
                         _logger.LogKafkaMessage(LoggingEvents.ConsumeMessageStart, "Received message", consumeResult);
 
+                        // TODO: Clarify error handling behaviour
+
+                        // Consumers will need different error handling strategies - some will ignore and move on, 
+                        // some will need to retry. Some will be managing their own offset, for example if the message
+                        // is being handled in a transaction then the offset can be committed to that same data store
+                        // as part of that transaction.  The consumer would then need to start from that offset, so the 
+                        // service needs to be flexible enough to allow that.  For now, we're letting Kafka manage
+                        // the offsets and errors in processing a message are just logged.
                         await _pipelineProvider.InvokePipeline(consumeResult);
 
                         _logger.LogKafkaMessage(LoggingEvents.ConsumeMessageEnd, "Finished with message", consumeResult);
+                    }
+                    catch (ConsumeException cex)
+                    {
+                        _logger.LogKafkaException(LoggingEvents.ConsumeMessageException, cex);
                     }
                     catch (Exception ex)
                     {
@@ -103,7 +115,7 @@ namespace Diadophis.Kafka
 
                 consumer.Close();
 
-                _logger.LogDebug(LoggingEvents.ExitedConsumerLoop, "Exited consumer loop");
+                _logger.LogInformation(LoggingEvents.StopAsync, "Stopping KafkaConsumerService");
             }
         }
 

@@ -12,7 +12,6 @@ namespace SimpleKafkaConsumer
 {
     public class Startup
     {
-
         private readonly IConfiguration _config;
 
         public Startup(IConfiguration config)
