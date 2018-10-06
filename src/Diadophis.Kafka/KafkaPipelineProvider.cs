@@ -9,21 +9,21 @@ using Microsoft.Extensions.Logging;
 
 namespace Diadophis.Kafka
 {
-    internal class KafkaPipelineProvider : IKafkaPipelineProvider
+    internal class KafkaPipelineProvider<TKey, TValue> : IKafkaPipelineProvider<TKey, TValue>
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly ILogger<KafkaPipelineProvider> _logger;
+        private readonly ILogger<KafkaPipelineProvider<TKey, TValue>> _logger;
 
         private MessageDelegate _pipeline;
 
         public KafkaPipelineProvider(IServiceProvider serviceProvider,
-            ILogger<KafkaPipelineProvider> logger)
+            ILogger<KafkaPipelineProvider<TKey, TValue>> logger)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
         }
 
-        public void Initialise(IKafkaConfig config)
+        public void Initialise(IKafkaConfig<TKey, TValue> config)
         {
             _logger.LogTrace(LoggingEvents.Initialise, "Initialising provider");
 
@@ -48,7 +48,7 @@ namespace Diadophis.Kafka
             }
         }
 
-        public Task InvokePipeline<TKey, TValue>(ConsumeResult<TKey, TValue> consumeResult)
+        public Task InvokePipeline(ConsumeResult<TKey, TValue> consumeResult)
         {
             return _pipeline.Invoke(new KafkaMessageContext<TKey, TValue>(_serviceProvider, consumeResult));
         }

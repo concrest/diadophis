@@ -8,27 +8,25 @@ namespace Diadophis.Kafka
     /// <summary>
     /// Basic consumer configuration settings.
     /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
-    public abstract class BasicConsumerConfig<TKey, TValue> : IKafkaConfig
+    public abstract class BasicConsumerConfig<TKey, TValue> : IKafkaConfig<TKey, TValue>
     {
         public string BrokerUrls { get ; set; }
         public string ConsumerGroupId { get; set; }
         public string[] Topics { get; set; }
 
-        /// <summary>
-        /// Configures the consumer to start reading from the latest offset 
-        /// in the absence of a previously committed offset.
-        /// Sets EnableAutoCommit to true
-        /// </summary>
-        /// <param name="config"></param>
-        public virtual void ConfigureConsumer(ConsumerConfig config)
-        {
-            config.EnableAutoCommit = true;
-            config.AutoOffsetReset = AutoOffsetResetType.Latest;
-        }
-
         public abstract void ConfigurePipeline(IPipelineBuilder pipe);
-        
+
+        public virtual IConsumerStrategy<TKey, TValue> CreateConsumerStrategy()
+        {
+            var config = new ConsumerConfig
+            {
+                BootstrapServers = BrokerUrls,
+                GroupId = ConsumerGroupId,
+                EnableAutoCommit = true,
+                AutoOffsetReset = AutoOffsetResetType.Latest
+            };
+
+            return new BasicConsumerStrategy<TKey, TValue>(config);
+        }
     }
 }

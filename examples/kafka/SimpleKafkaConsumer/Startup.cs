@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Diadophis.Kafka;
 using Microsoft.Extensions.Configuration;
+using Confluent.Kafka;
 
 namespace SimpleKafkaConsumer
 {
@@ -23,7 +24,7 @@ namespace SimpleKafkaConsumer
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddKafkaConsumer<SimpleKafkaConfig>(_config.GetSection("SimpleKafkaConfig"));
+            services.AddKafkaConsumer<SimpleKafkaConfig, Ignore, string>(_config.GetSection("SimpleKafkaConfig"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

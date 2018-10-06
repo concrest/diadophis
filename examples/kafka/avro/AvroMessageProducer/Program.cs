@@ -14,6 +14,13 @@ namespace AvroMessageProducer
 
         static void Main(string[] args)
         {
+            int messages = 1;
+
+            if (args.Length > 0)
+            {
+                messages = int.Parse(args[0]);
+            }
+
             var config = new ProducerConfig
             {
                 BootstrapServers = "broker1:9092",
@@ -49,14 +56,19 @@ namespace AvroMessageProducer
                     user_agent = "Foo"
                 };
 
-                // Alternatively - await ProduceAsync
-                producer.BeginProduce(
-                    "http-requests",
-                    new Message<string, HttpRequest>
-                    {
-                        Key = "user1@somewhere.io",
-                        Value = httpRequest
-                    });
+
+                for (int i = 0; i < messages; i++)
+                {
+                    Console.WriteLine($"[{DateTime.Now:HH:mm:ss.fff}] Sending message {i + 1} of {messages}");
+                    // Alternatively - await ProduceAsync
+                    producer.BeginProduce(
+                        "http-requests",
+                        new Message<string, HttpRequest>
+                        {
+                            Key = "user1@somewhere.io",
+                            Value = httpRequest
+                        });
+                }
 
                 producer.Flush(TimeSpan.FromSeconds(30));
             }

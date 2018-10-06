@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using HttpRequestSchema = SchemaExamples.Model.HttpRequest;
 
 namespace SingleSchemaConsumer
 {
@@ -23,7 +24,7 @@ namespace SingleSchemaConsumer
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddKafkaConsumer<AvroKafkaConfig>(_config.GetSection("AvroKafkaConfig"));
+            services.AddKafkaConsumer<AvroKafkaConfig, string, HttpRequestSchema>(_config.GetSection("AvroKafkaConfig"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

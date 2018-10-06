@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Confluent.Kafka.Avro" Version="1.0.0-beta" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />
     <PackageReference Include="Serilog.Formatting.Compact" Version="1.0.0" />
@@ -17,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Diadophis.Kafka.Avro\Diadophis.Kafka.Avro.csproj" />
     <ProjectReference Include="..\..\..\..\src\Diadophis.Kafka\Diadophis.Kafka.csproj" />
     <ProjectReference Include="..\SchemaExamples\SchemaExamples.csproj" />
   </ItemGroup>

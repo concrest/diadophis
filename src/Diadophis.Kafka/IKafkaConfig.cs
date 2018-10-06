@@ -1,19 +1,16 @@
 ﻿// Copyright 2018 Concrest
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
-using Confluent.Kafka;
-
 namespace Diadophis.Kafka
 {
-    public interface IKafkaConfig
+    public interface IKafkaConfig<TKey, TValue>
     {
         string BrokerUrls { get; set; }
         string ConsumerGroupId { get; set; }
         string[] Topics { get; set; }
 
-        void ConfigureConsumer(ConsumerConfig config);
+        IConsumerStrategy<TKey, TValue> CreateConsumerStrategy();
 
         void ConfigurePipeline(IPipelineBuilder pipe);
-        
     }
 }

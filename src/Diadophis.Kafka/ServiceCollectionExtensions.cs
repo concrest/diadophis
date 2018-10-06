@@ -10,20 +10,18 @@ namespace Diadophis.Kafka
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddKafkaConsumer<TKafkaConfig>(this IServiceCollection services,
+        public static IServiceCollection AddKafkaConsumer<TKafkaConfig, TKey, TValue>(this IServiceCollection services,
             IConfiguration config)
-            where TKafkaConfig : class, IKafkaConfig, new()
+            where TKafkaConfig : class, IKafkaConfig<TKey, TValue>, new()
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
 
             services.Configure<TKafkaConfig>(config);
 
             services.TryAddTransient<IPipelineBuilder, PipelineBuilder>();
-            services.TryAddTransient<IKafkaPipelineProvider, KafkaPipelineProvider>();
+            services.TryAddTransient<IKafkaPipelineProvider<TKey, TValue>, KafkaPipelineProvider<TKey, TValue>>();
 
-            // TODO: Register Confluent.Kafka dependencies
-
-            services.AddHostedService<KafkaConsumerService<TKafkaConfig>>();
+            services.AddHostedService<KafkaConsumerService<TKafkaConfig, TKey, TValue>>();
 
             return services;
         }

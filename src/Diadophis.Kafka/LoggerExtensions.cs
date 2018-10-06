@@ -6,7 +6,7 @@ namespace Diadophis.Kafka
 {
     public static class LoggerExtensions
     {
-        public static void LogStart(this ILogger logger, EventId eventId, IKafkaConfig config)
+        public static void LogStart<TKey, TValue>(this ILogger logger, EventId eventId, IKafkaConfig<TKey, TValue> config)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
 

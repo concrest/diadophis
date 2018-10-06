@@ -6,10 +6,10 @@ using Confluent.Kafka;
 
 namespace Diadophis.Kafka
 {
-    public interface IKafkaPipelineProvider
+    public interface IKafkaPipelineProvider<TKey, TValue>
     {
-        void Initialise(IKafkaConfig config);
+        void Initialise(IKafkaConfig<TKey, TValue> config);
 
-        Task InvokePipeline<TKey, TValue>(ConsumeResult<TKey, TValue> consumeResult);
+        Task InvokePipeline(ConsumeResult<TKey, TValue> consumeResult);
     }
 }
