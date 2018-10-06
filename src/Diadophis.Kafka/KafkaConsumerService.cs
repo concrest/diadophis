@@ -55,25 +55,6 @@ namespace Diadophis.Kafka
 
         private async Task StartKafkaConsumer(CancellationToken cancellationToken)
         {
-            /*
-             * Design is wrong.  Need to be able to configure the consumer, plus control how to instantiate the
-             * consumer.  For Avro, need to pass in Avro serde options, and Schema Registry config.
-             * 
-             * Maybe all this should be in the interface call?
-             * 
-             * Need better abstraction around the consumer!
-             * 
-             */
-
-
-            //var consumerConfig = new ConsumerConfig
-            //{
-            //    BootstrapServers = _config.BrokerUrls,
-            //    GroupId = _config.ConsumerGroupId
-            //};
-
-            //_config.ConfigureConsumer(consumerConfig);
-
             using (var consumerStrategy = _config.CreateConsumerStrategy())
             {
                 consumerStrategy.Consumer.OnError += (_, e) =>
