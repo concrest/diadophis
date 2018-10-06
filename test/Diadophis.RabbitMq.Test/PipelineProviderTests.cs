@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Diadophis.Fakes;
 using Microsoft.Extensions.Logging;
 using Moq;
 using RabbitMQ.Client;

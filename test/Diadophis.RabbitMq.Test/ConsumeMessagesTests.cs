@@ -4,6 +4,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Diadophis.Fakes;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -64,6 +65,7 @@ namespace Diadophis.RabbitMq.Test
         [Fact]
         public void Dispose_without_start_is_no_op()
         {
+            // TODO: Why does this test take 10 times longer than the others in this class?
             _sut.Dispose();
 
             Assert.Contains(_logger.LogEntries, e => e.EventId.Id == 103 && e.LogLevel == LogLevel.Trace);

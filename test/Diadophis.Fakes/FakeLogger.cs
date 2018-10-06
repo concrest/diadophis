@@ -5,18 +5,17 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
-using Moq;
 
-namespace Diadophis.RabbitMq.Test
+namespace Diadophis.Fakes
 {
     [ExcludeFromCodeCoverage]
-    internal class FakeLogger<TCategoryName> : ILogger<TCategoryName>
+    public partial class FakeLogger<TCategoryName> : ILogger<TCategoryName>
     {
         public List<LogEntry> LogEntries { get; } = new List<LogEntry>();
 
         public IDisposable BeginScope<TState>(TState state)
         {
-            return Mock.Of<IDisposable>();
+            return new FakeDisposable();
         }
 
         public bool IsEnabled(LogLevel logLevel)
@@ -26,19 +25,9 @@ namespace Diadophis.RabbitMq.Test
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
-            LogEntries.Add(new LogEntry(logLevel, eventId));
-        }
+            var values = state as IEnumerable<KeyValuePair<string, object>> ?? new KeyValuePair<string, object>[0];
 
-        internal class LogEntry
-        {
-            public LogEntry(LogLevel logLevel, EventId eventId)
-            {
-                LogLevel = logLevel;
-                EventId = eventId;
-            }
-
-            public LogLevel LogLevel { get; }
-            public EventId EventId { get; }
+            LogEntries.Add(new LogEntry(logLevel, eventId, values));
         }
     }
 }

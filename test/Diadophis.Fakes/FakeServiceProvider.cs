@@ -4,9 +4,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace Diadophis.RabbitMq.Test
+namespace Diadophis.Fakes
 {
-    internal class FakeServiceProvider : IServiceProvider
+    public class FakeServiceProvider : IServiceProvider
     {
         public Dictionary<Type, object> Container { get; } = new Dictionary<Type, object>();
 
