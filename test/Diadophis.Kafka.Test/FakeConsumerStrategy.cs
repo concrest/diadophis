@@ -1,4 +1,7 @@
-﻿using Confluent.Kafka;
+﻿// Copyright 2018 Concrest
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
+using Confluent.Kafka;
 using Moq;
 
 namespace Diadophis.Kafka.Test
