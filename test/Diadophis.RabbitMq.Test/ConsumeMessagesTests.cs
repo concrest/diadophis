@@ -4,6 +4,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Diadophis.Fakes;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -50,7 +51,7 @@ namespace Diadophis.RabbitMq.Test
 
             Mock.Get(_channel).Raise(c => c.CallbackException += null, new CallbackExceptionEventArgs(new ArgumentNullException()));
 
-            Assert.Contains(_logger.LogEntries, e => e.EventId.Id == 304 && e.LogLevel == LogLevel.Warning);
+            Assert.Contains(_logger.LogEntries, e => e.EventId.Id == 204 && e.LogLevel == LogLevel.Warning);
         }
 
         [Fact]
@@ -58,15 +59,16 @@ namespace Diadophis.RabbitMq.Test
         {
             await _sut.StopAsync(Token);
 
-            Assert.Contains(_logger.LogEntries, e => e.EventId.Id == 202 && e.LogLevel == LogLevel.Information);
+            Assert.Contains(_logger.LogEntries, e => e.EventId.Id == 102 && e.LogLevel == LogLevel.Information);
         }
 
         [Fact]
         public void Dispose_without_start_is_no_op()
         {
+            // TODO: Why does this test take 10 times longer than the others in this class?
             _sut.Dispose();
 
-            Assert.Contains(_logger.LogEntries, e => e.EventId.Id == 205 && e.LogLevel == LogLevel.Trace);
+            Assert.Contains(_logger.LogEntries, e => e.EventId.Id == 103 && e.LogLevel == LogLevel.Trace);
         }
 
         [Fact]
@@ -74,7 +76,7 @@ namespace Diadophis.RabbitMq.Test
         {
             await _sut.StartAsync(Token);
 
-            Assert.Contains(_logger.LogEntries, e => e.EventId.Id == 201 && e.LogLevel == LogLevel.Information);
+            Assert.Contains(_logger.LogEntries, e => e.EventId.Id == 101 && e.LogLevel == LogLevel.Information);
         }
     }
 }

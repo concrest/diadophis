@@ -8,10 +8,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moq;
-using RabbitMQ.Client;
 using Xunit;
 
-namespace Diadophis.RabbitMq.Test
+namespace Diadophis.Kafka.Test
 {
     public class ConsumerRegistrationTests
     {
@@ -26,7 +25,7 @@ namespace Diadophis.RabbitMq.Test
         [MemberData(nameof(TransientServiceRegistrationTestCases))]
         public void Registration_wires_up_transient_services(ServiceRegistrationTestCase testCase)
         {
-            _serviceCollection.AddRabbitMqConsumer<TestRabbitMqConfig>(Mock.Of<IConfiguration>());
+            _serviceCollection.AddKafkaConsumer<TestKafkaConfig, string, string>(Mock.Of<IConfiguration>());
 
             var actual = _serviceCollection.Single(sd => sd.ServiceType == testCase.ServiceType);
 
@@ -39,7 +38,7 @@ namespace Diadophis.RabbitMq.Test
         {
 
             _serviceCollection.Add(new ServiceDescriptor(testCase.ServiceType, testCase.Instance));
-            _serviceCollection.AddRabbitMqConsumer<TestRabbitMqConfig>(Mock.Of<IConfiguration>());
+            _serviceCollection.AddKafkaConsumer<TestKafkaConfig, string, string>(Mock.Of<IConfiguration>());
 
             var actual = _serviceCollection.Count(sd => sd.ServiceType == testCase.ServiceType);
 
@@ -49,27 +48,11 @@ namespace Diadophis.RabbitMq.Test
         [Fact]
         public void Consumer_service_is_a_hosted_service()
         {
-            _serviceCollection.AddRabbitMqConsumer<TestRabbitMqConfig>(Mock.Of<IConfiguration>());
+            _serviceCollection.AddKafkaConsumer<TestKafkaConfig, string, string>(Mock.Of<IConfiguration>());
 
-            var actual = _serviceCollection.Single(sd => sd.ImplementationType == typeof(RabbitMqConsumerService<TestRabbitMqConfig>));
+            var actual = _serviceCollection.Single(sd => sd.ImplementationType == typeof(KafkaConsumerService<TestKafkaConfig, string, string>));
 
             Assert.Equal(typeof(IHostedService), actual.ServiceType);
-        }
-
-        [Fact]
-        public void Rabbit_connection_factory_enables_async_consumers()
-        {
-            _serviceCollection.AddRabbitMqConsumer<TestRabbitMqConfig>(Mock.Of<IConfiguration>());
-
-            // Get the implementation factory for the connection factory, and invoke it with a 
-            // null IServiceProvider because the implementation factory shouldn't need one
-            var actual = (ConnectionFactory)_serviceCollection
-                .Single(sd => sd.ServiceType == typeof(IConnectionFactory))
-                .ImplementationFactory
-                .Invoke(null);
-
-            Assert.True(actual.DispatchConsumersAsync);
-
         }
 
         [Fact]
@@ -78,7 +61,7 @@ namespace Diadophis.RabbitMq.Test
             ServiceCollection isNull = null;
 
             var actual = Assert.Throws<ArgumentNullException>(
-                () => isNull.AddRabbitMqConsumer<TestRabbitMqConfig>(Mock.Of<IConfiguration>())
+                () => isNull.AddKafkaConsumer<TestKafkaConfig, string, string>(Mock.Of<IConfiguration>())
             );
 
             Assert.Equal("services", actual.ParamName);
@@ -86,8 +69,7 @@ namespace Diadophis.RabbitMq.Test
 
         public static IEnumerable<object[]> TransientServiceRegistrationTestCases()
         {
-            yield return new object[] { new ServiceRegistrationTestCase<IRabbitMqPipelineProvider>() };
-            yield return new object[] { new ServiceRegistrationTestCase<IConnectionFactory>() };
+            yield return new object[] { new ServiceRegistrationTestCase<IKafkaPipelineProvider<string, string>>() };
             yield return new object[] { new ServiceRegistrationTestCase<IPipelineBuilder>() };
         }
 
