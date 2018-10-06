@@ -19,7 +19,7 @@ namespace Diadophis.Kafka.Test
         [Fact]
         public void Startup_logs_configured_information()
         {
-            _sut.LogStart(_eventId, new FakeKafkaConfig());
+            _sut.LogStart(_eventId, new TestKafkaConfig());
 
             var entry = _sut.LogEntries.Single(l => l.LogLevel == LogLevel.Information && l.EventId.Id == 1);
 
