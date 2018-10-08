@@ -32,6 +32,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "avro", "avro", "{C7EB3D16-AA43-4DCF-B191-B6AABE618B46}"
 	ProjectSection(SolutionItems) = preProject
 		examples\kafka\avro\HttpRequest.asvc = examples\kafka\avro\HttpRequest.asvc
+		examples\kafka\avro\PageView.asvc = examples\kafka\avro\PageView.asvc
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SingleSchemaConsumer", "examples\kafka\avro\SingleSchemaConsumer\SingleSchemaConsumer.csproj", "{D0F73ADE-E262-4495-A00F-CE806C52A603}"
@@ -46,7 +47,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Diadophis.Fakes", "test\Dia
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Diadophis.Serilog", "src\Diadophis.Serilog\Diadophis.Serilog.csproj", "{FF2BAB8E-3CD6-4A2A-B02C-48B587286391}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvroConsumerProducer", "examples\kafka\avro\AvroConsumerProducer\AvroConsumerProducer.csproj", "{842276E3-1377-4C90-AE99-A4743CBFABED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvroConsumerProducer", "examples\kafka\avro\AvroConsumerProducer\AvroConsumerProducer.csproj", "{842276E3-1377-4C90-AE99-A4743CBFABED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

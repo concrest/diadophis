@@ -1,0 +1,28 @@
+{
+  "namespace": "SchemaExamples.Model",
+  "type": "record",
+  "name": "PageView",
+  "fields": [
+    {
+      "name": "page_type",
+      "doc": "The type of the page the user requested",
+      "type": {
+        "type": "enum",
+        "name": "PageTypes",
+        "symbols": [ "Login", "LogOut", "Dashboard", "Settings", "Reports", "Other" ]
+      },
+      "default": "Login"
+    },    
+    {
+      "name": "user_agent",
+      "type": "string",
+      "doc": "The user agent that made the request"
+    },
+    {
+      "name": "timestamp",
+      "doc": "UTC time the request was made",
+      "type": "long",
+      "logicalType": "timestamp-millis"
+    }
+  ]
+}

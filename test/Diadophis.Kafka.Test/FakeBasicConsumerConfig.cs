@@ -9,7 +9,7 @@ namespace Diadophis.Kafka.Test
         {
             BrokerUrls = "broker1";
             ConsumerGroupId = "consumer";
-            Topics = new[] { "topic" };
+            Topic = "topic";
         }
 
         public override void ConfigurePipeline(IPipelineBuilder pipe)

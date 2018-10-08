@@ -12,4 +12,21 @@
     <PackageReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Diadophis.Kafka.Avro\Diadophis.Kafka.Avro.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Diadophis.Kafka\Diadophis.Kafka.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Diadophis.Serilog\Diadophis.Serilog.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Diadophis\Diadophis.csproj" />
+    <ProjectReference Include="..\SchemaExamples\SchemaExamples.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="appsettings.Development.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

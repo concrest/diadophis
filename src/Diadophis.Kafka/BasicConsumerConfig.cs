@@ -8,11 +8,11 @@ namespace Diadophis.Kafka
     /// <summary>
     /// Basic consumer configuration settings.
     /// </summary>
-    public abstract class BasicConsumerConfig<TKey, TValue> : IKafkaConfig<TKey, TValue>
+    public abstract class BasicConsumerConfig<TKey, TValue> : IKafkaConsumerConfig<TKey, TValue>
     {
         public string BrokerUrls { get ; set; }
         public string ConsumerGroupId { get; set; }
-        public string[] Topics { get; set; }
+        public string Topic { get; set; }
 
         public abstract void ConfigurePipeline(IPipelineBuilder pipe);
 

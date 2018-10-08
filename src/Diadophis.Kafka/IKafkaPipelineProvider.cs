@@ -8,7 +8,7 @@ namespace Diadophis.Kafka
 {
     public interface IKafkaPipelineProvider<TKey, TValue>
     {
-        void Initialise(IKafkaConfig<TKey, TValue> config);
+        void Initialise(IKafkaConsumerConfig<TKey, TValue> config);
 
         Task InvokePipeline(ConsumeResult<TKey, TValue> consumeResult);
     }

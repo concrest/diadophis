@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace Diadophis.Kafka.Test
 {
-    internal class TestKafkaConfig : IKafkaConfig<string, string>
+    internal class TestKafkaConfig : IKafkaConsumerConfig<string, string>
     {
         public List<MessageContext> MessagesReceived { get; } = new List<MessageContext>();
 
         public string BrokerUrls { get; set; } = "broker:9090";
         public string ConsumerGroupId { get; set; } = "consumer";
-        public string[] Topics { get; set; } = new[] { "topic" };
+        public string Topic { get; set; } = "topic";
 
         public void ConfigurePipeline(IPipelineBuilder builder)
         {

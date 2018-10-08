@@ -23,7 +23,7 @@ namespace Diadophis.Kafka
             _logger = logger;
         }
 
-        public void Initialise(IKafkaConfig<TKey, TValue> config)
+        public void Initialise(IKafkaConsumerConfig<TKey, TValue> config)
         {
             _logger.LogTrace(LoggingEvents.Initialise, "Initialising provider");
 

@@ -3,11 +3,11 @@
 
 namespace Diadophis.Kafka
 {
-    public interface IKafkaConfig<TKey, TValue>
+    public interface IKafkaConsumerConfig<TKey, TValue>
     {
         string BrokerUrls { get; set; }
         string ConsumerGroupId { get; set; }
-        string[] Topics { get; set; }
+        string Topic { get; set; }
 
         IConsumerStrategy<TKey, TValue> CreateConsumerStrategy();
 

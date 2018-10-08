@@ -6,13 +6,13 @@ namespace Diadophis.Kafka
 {
     public static class LoggerExtensions
     {
-        public static void LogStart<TKey, TValue>(this ILogger logger, EventId eventId, IKafkaConfig<TKey, TValue> config)
+        public static void LogStart<TKey, TValue>(this ILogger logger, EventId eventId, IKafkaConsumerConfig<TKey, TValue> config)
         {
             if (logger == null) throw new ArgumentNullException(nameof(logger));
 
             logger.LogInformation(eventId,
-                "Starting KafkaConsumerService for BrokerUrls {BrokerUrls}, ConsumerGroupId {ConsumerGroupId}, Topics {Topics}",
-                config.BrokerUrls, config.ConsumerGroupId, config.Topics);
+                "Starting KafkaConsumerService for BrokerUrls {BrokerUrls}, ConsumerGroupId {ConsumerGroupId}, Topic {Topic}",
+                config.BrokerUrls, config.ConsumerGroupId, config.Topic);
         }
 
         public static void LogKafkaMessage<TKey, TValue>(this ILogger logger, 

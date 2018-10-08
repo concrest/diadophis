@@ -12,7 +12,7 @@ using Microsoft.Extensions.Options;
 namespace Diadophis.Kafka
 {
     internal class KafkaConsumerService<TConfig, TKey, TValue> : BackgroundService
-        where TConfig : class, IKafkaConfig<TKey, TValue>, new()
+        where TConfig : class, IKafkaConsumerConfig<TKey, TValue>, new()
     {
         // Same 100 millisecond timeout as in https://github.com/confluentinc/confluent-kafka-dotnet/blob/master/src/Confluent.Kafka/Consumer.cs
         private static readonly TimeSpan ConsumeTimeout = TimeSpan.FromMilliseconds(100);
@@ -62,7 +62,7 @@ namespace Diadophis.Kafka
                     _logger.LogErrorEvent(LoggingEvents.ConsumerOnErrorEvent, e);
                 };
 
-                consumerStrategy.Consumer.Subscribe(_config.Topics);
+                consumerStrategy.Consumer.Subscribe(_config.Topic);
 
                 // TODO: Would we need a hook here for resuming from a set offset?
                 // Does Assign need to get called after Subscribe?

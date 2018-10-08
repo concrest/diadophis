@@ -25,7 +25,7 @@ namespace Diadophis.Kafka.Test
 
             Assert.Equal("broker:9090", entry.GetValue("BrokerUrls"));
             Assert.Equal("consumer", entry.GetValue("ConsumerGroupId"));
-            Assert.Equal("topic", ((string[])entry.GetValue("Topics"))[0]);
+            Assert.Equal("topic", entry.GetValue("Topic"));
         }
 
         [Fact]

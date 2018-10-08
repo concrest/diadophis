@@ -28,7 +28,7 @@ namespace Diadophis.Kafka.Test
         public void Initialisation_errors_are_logged()
         {
             // There's no setup for IPipelineBuilder in IoC, so this should throw
-            Assert.Throws<InvalidOperationException>(() => _sut.Initialise(Mock.Of<IKafkaConfig<string, string>>()));
+            Assert.Throws<InvalidOperationException>(() => _sut.Initialise(Mock.Of<IKafkaConsumerConfig<string, string>>()));
 
             Assert.Contains(_logger.LogEntries, l => l.EventId.Id == 102 && l.LogLevel == LogLevel.Error);
         }
