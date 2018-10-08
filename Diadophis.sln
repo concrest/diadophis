@@ -40,9 +40,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchemaExamples", "examples\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvroMessageProducer", "examples\kafka\avro\AvroMessageProducer\AvroMessageProducer.csproj", "{971884AE-2216-40FD-80B4-2666154E2BBA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diadophis.Kafka.Avro", "src\Diadophis.Kafka.Avro\Diadophis.Kafka.Avro.csproj", "{1A5F405E-D78F-4C6C-8920-121A7EE82F1D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Diadophis.Kafka.Avro", "src\Diadophis.Kafka.Avro\Diadophis.Kafka.Avro.csproj", "{1A5F405E-D78F-4C6C-8920-121A7EE82F1D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diadophis.Fakes", "test\Diadophis.Fakes\Diadophis.Fakes.csproj", "{6CBD696A-1162-47E9-81ED-37CAD0D26759}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Diadophis.Fakes", "test\Diadophis.Fakes\Diadophis.Fakes.csproj", "{6CBD696A-1162-47E9-81ED-37CAD0D26759}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Diadophis.Serilog", "src\Diadophis.Serilog\Diadophis.Serilog.csproj", "{FF2BAB8E-3CD6-4A2A-B02C-48B587286391}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -210,6 +212,18 @@ Global
 		{6CBD696A-1162-47E9-81ED-37CAD0D26759}.Release|x64.Build.0 = Release|Any CPU
 		{6CBD696A-1162-47E9-81ED-37CAD0D26759}.Release|x86.ActiveCfg = Release|Any CPU
 		{6CBD696A-1162-47E9-81ED-37CAD0D26759}.Release|x86.Build.0 = Release|Any CPU
+		{FF2BAB8E-3CD6-4A2A-B02C-48B587286391}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF2BAB8E-3CD6-4A2A-B02C-48B587286391}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF2BAB8E-3CD6-4A2A-B02C-48B587286391}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FF2BAB8E-3CD6-4A2A-B02C-48B587286391}.Debug|x64.Build.0 = Debug|Any CPU
+		{FF2BAB8E-3CD6-4A2A-B02C-48B587286391}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FF2BAB8E-3CD6-4A2A-B02C-48B587286391}.Debug|x86.Build.0 = Debug|Any CPU
+		{FF2BAB8E-3CD6-4A2A-B02C-48B587286391}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF2BAB8E-3CD6-4A2A-B02C-48B587286391}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF2BAB8E-3CD6-4A2A-B02C-48B587286391}.Release|x64.ActiveCfg = Release|Any CPU
+		{FF2BAB8E-3CD6-4A2A-B02C-48B587286391}.Release|x64.Build.0 = Release|Any CPU
+		{FF2BAB8E-3CD6-4A2A-B02C-48B587286391}.Release|x86.ActiveCfg = Release|Any CPU
+		{FF2BAB8E-3CD6-4A2A-B02C-48B587286391}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -231,6 +245,7 @@ Global
 		{971884AE-2216-40FD-80B4-2666154E2BBA} = {C7EB3D16-AA43-4DCF-B191-B6AABE618B46}
 		{1A5F405E-D78F-4C6C-8920-121A7EE82F1D} = {197AB6A4-73B8-488E-B6DA-9E35593D59A3}
 		{6CBD696A-1162-47E9-81ED-37CAD0D26759} = {153015B9-28F4-46E0-BB13-BA403CD13105}
+		{FF2BAB8E-3CD6-4A2A-B02C-48B587286391} = {197AB6A4-73B8-488E-B6DA-9E35593D59A3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F7AFFDD9-5F0F-4F0E-B5DD-1C253F0B2E16}

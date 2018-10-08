@@ -13,13 +13,14 @@
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />
     <PackageReference Include="Serilog.Formatting.Compact" Version="1.0.0" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="2.6.1" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="3.0.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\Diadophis.Kafka.Avro\Diadophis.Kafka.Avro.csproj" />
     <ProjectReference Include="..\..\..\..\src\Diadophis.Kafka\Diadophis.Kafka.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Diadophis.Serilog\Diadophis.Serilog.csproj" />
     <ProjectReference Include="..\SchemaExamples\SchemaExamples.csproj" />
   </ItemGroup>
 
